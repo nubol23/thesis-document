@@ -1,0 +1,5 @@
+x = self.features(x)
+x = nn.functional.adaptive_avg_pool2d(x, 1).reshape(x.shape[0], -1)
+x = self.classifier(x)
+x = torch.cat([x, actions, prev_throttle], dim=1)
+x = self.concat_fc(x)

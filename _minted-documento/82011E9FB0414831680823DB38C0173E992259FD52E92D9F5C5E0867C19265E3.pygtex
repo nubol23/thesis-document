@@ -1,0 +1,480 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{pickle}
+\PYG{k+kn}{import} \PYG{n+nn}{torch}
+\PYG{k+kn}{import} \PYG{n+nn}{torchvision.transforms} \PYG{k+kn}{as} \PYG{n+nn}{transforms}
+\PYG{k+kn}{from} \PYG{n+nn}{torchvision.models} \PYG{k+kn}{import} \PYG{n}{mobilenet\PYGZus{}v2}
+\PYG{k+kn}{import} \PYG{n+nn}{torch.nn} \PYG{k+kn}{as} \PYG{n+nn}{nn}
+\PYG{k+kn}{import} \PYG{n+nn}{glob}
+\PYG{k+kn}{import} \PYG{n+nn}{os}
+\PYG{k+kn}{import} \PYG{n+nn}{sys}
+
+
+\PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{glob}\PYG{o}{.}\PYG{n}{glob}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}../carla/dist/carla\PYGZhy{}*}\PYG{l+s+si}{\PYGZpc{}d}\PYG{l+s+s1}{.}\PYG{l+s+si}{\PYGZpc{}d}\PYG{l+s+s1}{\PYGZhy{}}\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s1}{.egg\PYGZsq{}} \PYG{o}{\PYGZpc{}} \PYG{p}{(}
+  \PYG{n}{sys}\PYG{o}{.}\PYG{n}{version\PYGZus{}info}\PYG{o}{.}\PYG{n}{major}\PYG{p}{,}
+  \PYG{n}{sys}\PYG{o}{.}\PYG{n}{version\PYGZus{}info}\PYG{o}{.}\PYG{n}{minor}\PYG{p}{,}
+  \PYG{l+s+s1}{\PYGZsq{}win\PYGZhy{}amd64\PYGZsq{}} \PYG{k}{if} \PYG{n}{os}\PYG{o}{.}\PYG{n}{name} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}nt\PYGZsq{}} \PYG{k}{else} \PYG{l+s+s1}{\PYGZsq{}linux\PYGZhy{}x86\PYGZus{}64\PYGZsq{}}\PYG{p}{))[}\PYG{l+m+mi}{0}\PYG{p}{])}
+\PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}../carla\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}path/to/DriveNet\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}path/to/DepthNet\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}path/to/SemsegNet\PYGZsq{}}\PYG{p}{)}
+
+\PYG{k+kn}{from} \PYG{n+nn}{sync\PYGZus{}mode} \PYG{k+kn}{import} \PYG{n}{CarlaSyncMode}
+\PYG{k+kn}{from} \PYG{n+nn}{custom\PYGZus{}mobilenet} \PYG{k+kn}{import} \PYG{n}{CustomMobileNet}\PYG{p}{,} \PYG{n}{CustomMobileNetExt}
+\PYG{k+kn}{from} \PYG{n+nn}{models} \PYG{k+kn}{import} \PYG{n}{CustomMobilenetDepth}
+\PYG{k+kn}{from} \PYG{n+nn}{semseg\PYGZus{}model} \PYG{k+kn}{import} \PYG{n}{CustomMobilenetSemseg}
+\PYG{k+kn}{from} \PYG{n+nn}{constants} \PYG{k+kn}{import} \PYG{n}{junction\PYGZus{}data}\PYG{p}{,} \PYG{n}{contours}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{,} \PYG{n}{weather\PYGZus{}idxs}
+
+\PYG{k+kn}{import} \PYG{n+nn}{carla}
+
+\PYG{k+kn}{from} \PYG{n+nn}{collections} \PYG{k+kn}{import} \PYG{n}{Counter}
+\PYG{k+kn}{import} \PYG{n+nn}{pygame}
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k+kn}{as} \PYG{n+nn}{np}
+\PYG{k+kn}{import} \PYG{n+nn}{queue}
+\PYG{k+kn}{import} \PYG{n+nn}{re}
+\PYG{k+kn}{import} \PYG{n+nn}{math}
+\PYG{k+kn}{import} \PYG{n+nn}{weakref}
+\PYG{k+kn}{import} \PYG{n+nn}{collections}
+\PYG{k+kn}{import} \PYG{n+nn}{cv2}
+\PYG{k+kn}{from} \PYG{n+nn}{PIL} \PYG{k+kn}{import} \PYG{n}{Image}
+\PYG{k+kn}{from} \PYG{n+nn}{priority\PYGZus{}queue} \PYG{k+kn}{import} \PYG{n}{PriorityQueue}
+
+\PYG{k+kn}{from} \PYG{n+nn}{numba} \PYG{k+kn}{import} \PYG{n}{njit}
+
+\PYG{k}{def} \PYG{n+nf}{should\PYGZus{}quit}\PYG{p}{():}
+  \PYG{c+c1}{\PYGZsh{} función incluida con la API de Carla}
+  \PYG{k}{for} \PYG{n}{event} \PYG{o+ow}{in} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{event}\PYG{o}{.}\PYG{n}{get}\PYG{p}{():}
+    \PYG{k}{if} \PYG{n}{event}\PYG{o}{.}\PYG{n}{type} \PYG{o}{==} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{QUIT}\PYG{p}{:}
+      \PYG{k}{return} \PYG{n+nb+bp}{True}
+    \PYG{k}{elif} \PYG{n}{event}\PYG{o}{.}\PYG{n}{type} \PYG{o}{==} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{KEYUP}\PYG{p}{:}
+      \PYG{k}{if} \PYG{n}{event}\PYG{o}{.}\PYG{n}{key} \PYG{o}{==} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{K\PYGZus{}ESCAPE}\PYG{p}{:}
+        \PYG{k}{return} \PYG{n+nb+bp}{True}
+  \PYG{k}{return} \PYG{n+nb+bp}{False}
+
+
+\PYG{k}{def} \PYG{n+nf}{find\PYGZus{}weather\PYGZus{}presets}\PYG{p}{():}
+  \PYG{c+c1}{\PYGZsh{} función incluida con la API de Carla}
+  \PYG{n}{rgx} \PYG{o}{=} \PYG{n}{re}\PYG{o}{.}\PYG{n}{compile}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}.+?(?:(?\PYGZlt{}=[a\PYGZhy{}z])(?=[A\PYGZhy{}Z])|(?\PYGZlt{}=[A\PYGZhy{}Z])(?=[A\PYGZhy{}Z][a\PYGZhy{}z])|\PYGZdl{})\PYGZsq{}}\PYG{p}{)}
+
+  \PYG{k}{def} \PYG{n+nf}{name}\PYG{p}{(}\PYG{n}{x}\PYG{p}{):} \PYG{k}{return} \PYG{l+s+s1}{\PYGZsq{} \PYGZsq{}}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{m}\PYG{o}{.}\PYG{n}{group}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)} \PYG{k}{for} \PYG{n}{m} \PYG{o+ow}{in} \PYG{n}{rgx}\PYG{o}{.}\PYG{n}{finditer}\PYG{p}{(}\PYG{n}{x}\PYG{p}{))}
+
+  \PYG{n}{presets} \PYG{o}{=} \PYG{p}{[}\PYG{n}{x} \PYG{k}{for} \PYG{n}{x} \PYG{o+ow}{in} \PYG{n+nb}{dir}\PYG{p}{(}\PYG{n}{carla}\PYG{o}{.}\PYG{n}{WeatherParameters}\PYG{p}{)} \PYG{k}{if} \PYG{n}{re}\PYG{o}{.}\PYG{n}{match}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}[A\PYGZhy{}Z].+\PYGZsq{}}\PYG{p}{,} \PYG{n}{x}\PYG{p}{)]}
+  \PYG{k}{return} \PYG{p}{[(}\PYG{n+nb}{getattr}\PYG{p}{(}\PYG{n}{carla}\PYG{o}{.}\PYG{n}{WeatherParameters}\PYG{p}{,} \PYG{n}{x}\PYG{p}{),} \PYG{n}{name}\PYG{p}{(}\PYG{n}{x}\PYG{p}{))} \PYG{k}{for} \PYG{n}{x} \PYG{o+ow}{in} \PYG{n}{presets}\PYG{p}{]}
+
+
+\PYG{k}{def} \PYG{n+nf}{img\PYGZus{}to\PYGZus{}array}\PYG{p}{(}\PYG{n}{image}\PYG{p}{):}
+  \PYG{n}{array} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{frombuffer}\PYG{p}{(}\PYG{n}{image}\PYG{o}{.}\PYG{n}{raw\PYGZus{}data}\PYG{p}{,} \PYG{n}{dtype}\PYG{o}{=}\PYG{n}{np}\PYG{o}{.}\PYG{n}{dtype}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}uint8\PYGZdq{}}\PYG{p}{))}
+  \PYG{n}{array} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{array}\PYG{p}{,} \PYG{p}{(}\PYG{n}{image}\PYG{o}{.}\PYG{n}{height}\PYG{p}{,} \PYG{n}{image}\PYG{o}{.}\PYG{n}{width}\PYG{p}{,} \PYG{l+m+mi}{4}\PYG{p}{))}
+  \PYG{n}{array} \PYG{o}{=} \PYG{n}{array}\PYG{p}{[:,} \PYG{p}{:,} \PYG{p}{:}\PYG{l+m+mi}{3}\PYG{p}{]}
+  \PYG{k}{return} \PYG{n}{array}
+
+
+\PYG{k}{def} \PYG{n+nf}{show\PYGZus{}window}\PYG{p}{(}\PYG{n}{surface}\PYG{p}{,} \PYG{n}{array}\PYG{p}{,} \PYG{n}{pos}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{)):}
+  \PYG{k}{if} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{array}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{2}\PYG{p}{:}
+    \PYG{n}{array} \PYG{o}{=} \PYG{n}{array}\PYG{p}{[:,} \PYG{p}{:,} \PYG{p}{::}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]}
+  \PYG{n}{image\PYGZus{}surface} \PYG{o}{=} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{surfarray}\PYG{o}{.}\PYG{n}{make\PYGZus{}surface}\PYG{p}{(}\PYG{n}{array}\PYG{o}{.}\PYG{n}{swapaxes}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}
+  \PYG{n}{surface}\PYG{o}{.}\PYG{n}{blit}\PYG{p}{(}\PYG{n}{image\PYGZus{}surface}\PYG{p}{,} \PYG{n}{pos}\PYG{p}{)}
+
+
+\PYG{k}{def} \PYG{n+nf}{create\PYGZus{}camera}\PYG{p}{(}\PYG{n}{cam\PYGZus{}type}\PYG{p}{,} \PYG{n}{vehicle}\PYG{p}{,} \PYG{n}{pos}\PYG{p}{,} \PYG{n}{h}\PYG{p}{,} \PYG{n}{w}\PYG{p}{,} \PYG{n}{lib}\PYG{p}{,} \PYG{n}{world}\PYG{p}{):}
+  \PYG{n}{cam} \PYG{o}{=} \PYG{n}{lib}\PYG{o}{.}\PYG{n}{find}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}sensor.camera.\PYGZob{}cam\PYGZus{}type\PYGZcb{}\PYGZsq{}}\PYG{p}{)}
+  \PYG{n}{cam}\PYG{o}{.}\PYG{n}{set\PYGZus{}attribute}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}image\PYGZus{}size\PYGZus{}x\PYGZsq{}}\PYG{p}{,} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{w}\PYG{p}{))}
+  \PYG{n}{cam}\PYG{o}{.}\PYG{n}{set\PYGZus{}attribute}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}image\PYGZus{}size\PYGZus{}y\PYGZsq{}}\PYG{p}{,} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{h}\PYG{p}{))}
+  \PYG{n}{camera} \PYG{o}{=} \PYG{n}{world}\PYG{o}{.}\PYG{n}{spawn\PYGZus{}actor}\PYG{p}{(}
+    \PYG{n}{cam}\PYG{p}{,}
+    \PYG{n}{pos}\PYG{p}{,}
+    \PYG{n}{attach\PYGZus{}to}\PYG{o}{=}\PYG{n}{vehicle}\PYG{p}{,}
+    \PYG{n}{attachment\PYGZus{}type}\PYG{o}{=}\PYG{n}{carla}\PYG{o}{.}\PYG{n}{AttachmentType}\PYG{o}{.}\PYG{n}{Rigid}\PYG{p}{)}
+  \PYG{k}{return} \PYG{n}{camera}
+
+\PYG{k}{def} \PYG{n+nf}{set\PYGZus{}random\PYGZus{}weather}\PYG{p}{(}\PYG{n}{world}\PYG{p}{):}
+  \PYG{n}{weather\PYGZus{}presets} \PYG{o}{=} \PYG{n}{find\PYGZus{}weather\PYGZus{}presets}\PYG{p}{()}
+  \PYG{n}{weather\PYGZus{}index} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{choice}\PYG{p}{(}\PYG{n}{weather\PYGZus{}idxs}\PYG{p}{)}
+  \PYG{n}{preset} \PYG{o}{=} \PYG{n}{weather\PYGZus{}presets}\PYG{p}{[}\PYG{n}{weather\PYGZus{}index}\PYG{p}{]}
+  \PYG{n}{world}\PYG{o}{.}\PYG{n}{set\PYGZus{}weather}\PYG{p}{(}\PYG{n}{preset}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+  \PYG{k}{def} \PYG{n+nf}{spawn\PYGZus{}player}\PYG{p}{(}\PYG{n}{world}\PYG{p}{):}
+  \PYG{n}{world\PYGZus{}map} \PYG{o}{=} \PYG{n}{world}\PYG{o}{.}\PYG{n}{get\PYGZus{}map}\PYG{p}{()}
+  \PYG{n}{player} \PYG{o}{=} \PYG{n+nb+bp}{None}
+
+\PYG{k}{while} \PYG{n}{player} \PYG{o+ow}{is} \PYG{n+nb+bp}{None}\PYG{p}{:}
+  \PYG{n}{spawn\PYGZus{}points} \PYG{o}{=} \PYG{n}{world\PYGZus{}map}\PYG{o}{.}\PYG{n}{get\PYGZus{}spawn\PYGZus{}points}\PYG{p}{()}
+  \PYG{n}{spawn\PYGZus{}point} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{choice}\PYG{p}{(}\PYG{n}{spawn\PYGZus{}points}\PYG{p}{)} \PYG{k}{if} \PYG{n}{spawn\PYGZus{}points} \PYG{k}{else} \PYG{n}{carla}\PYG{o}{.}\PYG{n}{Transform}\PYG{p}{()}
+  \PYG{n}{player} \PYG{o}{=} \PYG{n}{world}\PYG{o}{.}\PYG{n}{try\PYGZus{}spawn\PYGZus{}actor}\PYG{p}{(}\PYG{n}{world}\PYG{o}{.}\PYG{n}{get\PYGZus{}blueprint\PYGZus{}library}\PYG{p}{()}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}model3\PYGZsq{}}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{],} 
+                                 \PYG{n}{spawn\PYGZus{}point}\PYG{p}{)}
+  \PYG{k}{return} \PYG{n}{player}
+
+\PYG{k}{def} \PYG{n+nf}{load\PYGZus{}network}\PYG{p}{(}\PYG{n}{model\PYGZus{}class}\PYG{p}{,} \PYG{n}{path}\PYG{p}{,} \PYG{n}{shape}\PYG{o}{=}\PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{n}{pretrained}\PYG{o}{=}\PYG{n+nb+bp}{None}\PYG{p}{):}
+  \PYG{k}{if} \PYG{n+nb}{isinstance}\PYG{p}{(}\PYG{n}{shape}\PYG{p}{,} \PYG{n+nb}{type}\PYG{p}{(}\PYG{n+nb+bp}{None}\PYG{p}{)):}
+    \PYG{n}{model} \PYG{o}{=} \PYG{n}{model\PYGZus{}class}\PYG{p}{()}
+  \PYG{k}{else}\PYG{p}{:}
+    \PYG{n}{model} \PYG{o}{=} \PYG{n}{model\PYGZus{}class}\PYG{p}{((}\PYG{l+m+mi}{180}\PYG{p}{,} \PYG{l+m+mi}{240}\PYG{p}{),} \PYG{n}{pretrained}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{)}
+
+  \PYG{n}{epoch}\PYG{p}{,} \PYG{n}{arch}\PYG{p}{,} \PYG{n}{state\PYGZus{}dict} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{path}\PYG{p}{)}\PYG{o}{.}\PYG{n}{values}\PYG{p}{()}
+  \PYG{n}{model}\PYG{o}{.}\PYG{n}{load\PYGZus{}state\PYGZus{}dict}\PYG{p}{(}\PYG{n}{state\PYGZus{}dict}\PYG{p}{)}
+  \PYG{n}{model} \PYG{o}{=} \PYG{n}{model}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{()}
+  \PYG{n}{model}\PYG{o}{.}\PYG{n}{eval}\PYG{p}{()}
+  \PYG{k}{return} \PYG{n}{model}
+
+\PYG{k}{def} \PYG{n+nf}{take\PYGZus{}action}\PYG{p}{(}\PYG{n}{world}\PYG{p}{,} \PYG{n}{junction\PYGZus{}data}\PYG{p}{,} \PYG{n}{road\PYGZus{}id}\PYG{p}{,} \PYG{n}{lane\PYGZus{}id}\PYG{p}{,} \PYG{n}{action}\PYG{p}{,} \PYG{n}{position}\PYG{p}{):}
+  \PYG{n}{wp} \PYG{o}{=} \PYG{n}{world}\PYG{o}{.}\PYG{n}{get\PYGZus{}map}\PYG{p}{()}\PYG{o}{.}\PYG{n}{get\PYGZus{}waypoint}\PYG{p}{(}\PYG{n}{position}\PYG{p}{)}
+  \PYG{k}{if} \PYG{n}{wp}\PYG{o}{.}\PYG{n}{is\PYGZus{}junction}\PYG{p}{:}
+    \PYG{n}{junc} \PYG{o}{=} \PYG{n}{wp}\PYG{o}{.}\PYG{n}{get\PYGZus{}junction}\PYG{p}{()}
+    \PYG{n}{k} \PYG{o}{=} \PYG{p}{(}\PYG{n}{road\PYGZus{}id}\PYG{p}{,} \PYG{n}{lane\PYGZus{}id}\PYG{p}{,} \PYG{n}{junc}\PYG{o}{.}\PYG{n}{id}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} Si llega a una intersección por lado desconocido}
+    \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{k} \PYG{o+ow}{in} \PYG{n}{junction\PYGZus{}data}\PYG{o}{.}\PYG{n}{keys}\PYG{p}{():}
+      \PYG{n}{action} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{]}
+    \PYG{k}{else}\PYG{p}{:}
+      \PYG{n}{choice} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{choice}\PYG{p}{(}\PYG{n}{junction\PYGZus{}data}\PYG{p}{[}\PYG{n}{k}\PYG{p}{])}
+      \PYG{k}{if} \PYG{n}{action} \PYG{o}{==} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{]:}
+        \PYG{k}{if} \PYG{n}{choice} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}l\PYGZsq{}}\PYG{p}{:}
+          \PYG{n}{action} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}
+        \PYG{k}{elif} \PYG{n}{choice} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}r\PYGZsq{}}\PYG{p}{:}
+          \PYG{n}{action} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}
+        \PYG{k}{elif} \PYG{n}{choice} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}f\PYGZsq{}}\PYG{p}{:}
+          \PYG{n}{action} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}
+  \PYG{k}{else}\PYG{p}{:}
+    \PYG{n}{road\PYGZus{}id}\PYG{p}{,} \PYG{n}{lane\PYGZus{}id} \PYG{o}{=} \PYG{n}{wp}\PYG{o}{.}\PYG{n}{road\PYGZus{}id}\PYG{p}{,} \PYG{n}{wp}\PYG{o}{.}\PYG{n}{lane\PYGZus{}id}
+    \PYG{n}{action} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{]}
+  \PYG{k}{return} \PYG{n}{road\PYGZus{}id}\PYG{p}{,} \PYG{n}{lane\PYGZus{}id}\PYG{p}{,} \PYG{n}{action}
+
+\PYG{k}{def} \PYG{n+nf}{steer\PYGZus{}correction}\PYG{p}{(}\PYG{n}{action}\PYG{p}{,} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{,} \PYG{n}{threshold}\PYG{p}{):}
+  \PYG{k}{if} \PYG{n}{action} \PYG{o}{==} \PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]:}
+    \PYG{n}{action\PYGZus{}str} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}left\PYGZsq{}}
+    \PYG{c+c1}{\PYGZsh{} Si no está en un rango de giro mínimo}
+    \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{o}{\PYGZhy{}}\PYG{n}{threshold}\PYG{p}{:}
+      \PYG{n}{action\PYGZus{}str} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}force left\PYGZsq{}}
+      \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{o}{\PYGZhy{}}\PYG{n}{threshold}\PYG{p}{:}                  
+      \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{max}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{n}{threshold} \PYG{o}{\PYGZhy{}} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ac\PYGZsq{}}\PYG{p}{],} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{0.8}\PYG{p}{)}
+      \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ac\PYGZsq{}}\PYG{p}{]} \PYG{o}{+=} \PYG{l+m+mf}{0.02}          
+    \PYG{k}{else}\PYG{p}{:}
+      \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ac\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}       
+    \PYG{n}{ema\PYGZus{}str} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}\PYGZsq{}}
+  \PYG{k}{elif} \PYG{n}{action} \PYG{o}{==} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]:}
+    \PYG{n}{action\PYGZus{}str} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}right\PYGZsq{}}
+    \PYG{c+c1}{\PYGZsh{} similar al caso de arriba pero al otro lado}
+    \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZgt{}} \PYG{n}{threshold}\PYG{p}{:} 
+      \PYG{n}{action\PYGZus{}str} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}force right\PYGZsq{}}
+      \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{threshold} \PYG{o}{+} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ac\PYGZsq{}}\PYG{p}{],} \PYG{l+m+mf}{0.8}\PYG{p}{)}
+      \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ac\PYGZsq{}}\PYG{p}{]} \PYG{o}{+=} \PYG{l+m+mf}{0.02}
+    \PYG{k}{else}\PYG{p}{:}
+      \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ac\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{n}{ema\PYGZus{}str} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}\PYGZsq{}}
+  \PYG{k}{elif} \PYG{n}{action} \PYG{o}{==} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]:}
+    \PYG{n}{action\PYGZus{}str} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}forward\PYGZsq{}}
+    \PYG{k}{if} \PYG{o+ow}{not} \PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{])} \PYG{o}{\PYGZlt{}=} \PYG{n}{threshold}\PYG{p}{:}             
+      \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{]}
+    \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ac\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}        
+    \PYG{n}{ema\PYGZus{}str} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}\PYGZsq{}}
+  \PYG{k}{elif} \PYG{n}{action} \PYG{o}{==} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{]:}
+    \PYG{k}{if} \PYG{n+nb}{isinstance}\PYG{p}{(}\PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ema\PYGZsq{}}\PYG{p}{],} \PYG{n+nb}{type}\PYG{p}{(}\PYG{n+nb+bp}{None}\PYG{p}{)):} \PYG{c+c1}{\PYGZsh{} inicializar EMA}
+      \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ema\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{]}             
+    \PYG{k}{else}\PYG{p}{:}
+      \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ema\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}alpha\PYGZsq{}}\PYG{p}{]}\PYG{o}{*}\PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{]}\PYG{o}{+}\PYGZbs{}
+       \PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}alpha\PYGZsq{}}\PYG{p}{])}\PYG{o}{*}\PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ema\PYGZsq{}}\PYG{p}{]}
+    \PYG{k}{if} \PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{])} \PYG{o}{\PYGZlt{}=} \PYG{n}{threshold}\PYG{p}{:}  
+      \PYG{n}{s} \PYG{o}{=} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ema\PYGZsq{}}\PYG{p}{]}              
+    \PYG{k}{else}\PYG{p}{:}
+      \PYG{n}{ema\PYGZus{}str} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}\PYGZsq{}}
+    \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}ac\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{n}{action\PYGZus{}str} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}no action\PYGZsq{}}
+
+    \PYG{k}{return} \PYG{n}{action\PYGZus{}str}\PYG{p}{,} \PYG{n}{ema\PYGZus{}str} \PYG{c+c1}{\PYGZsh{} dbg}
+
+\PYG{k}{def} \PYG{n+nf}{get\PYGZus{}class\PYGZus{}semseg}\PYG{p}{(}\PYG{n}{segmentation}\PYG{p}{,} \PYG{n}{class\PYGZus{}id}\PYG{p}{):}
+  \PYG{n}{seg} \PYG{o}{=} \PYG{p}{((}\PYG{n}{segmentation} \PYG{o}{==} \PYG{n}{class\PYGZus{}id}\PYG{p}{)}\PYG{o}{*}\PYG{l+m+mi}{255}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{uint8}\PYG{p}{)}
+  \PYG{n}{seg} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{morphologyEx}\PYG{p}{(}\PYG{n}{seg}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{MORPH\PYGZus{}OPEN}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{((}\PYG{l+m+mi}{5}\PYG{p}{,} \PYG{l+m+mi}{5}\PYG{p}{)))}
+  \PYG{n}{seg} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{dilate}\PYG{p}{(}\PYG{n}{seg}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{((}\PYG{l+m+mi}{5}\PYG{p}{,} \PYG{l+m+mi}{5}\PYG{p}{)),} \PYG{n}{iterations} \PYG{o}{=} \PYG{l+m+mi}{2}\PYG{p}{)}
+  \PYG{n}{seg} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{erode}\PYG{p}{(}\PYG{n}{seg}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{((}\PYG{l+m+mi}{5}\PYG{p}{,} \PYG{l+m+mi}{5}\PYG{p}{)),} \PYG{n}{iterations} \PYG{o}{=} \PYG{l+m+mi}{1}\PYG{p}{)}
+  \PYG{k}{return} \PYG{n}{seg}
+
+\PYG{k}{def} \PYG{n+nf}{extract\PYGZus{}objects\PYGZus{}depth}\PYG{p}{(}\PYG{n}{depth\PYGZus{}map}\PYG{p}{,} \PYG{n}{contours}\PYG{p}{,} \PYG{n}{veh}\PYG{p}{,} \PYG{n}{poles}\PYG{p}{,} \PYG{n}{ped}\PYG{p}{):}
+  \PYG{n}{objects\PYGZus{}depth} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{round}\PYG{p}{(}\PYG{n}{depth\PYGZus{}map}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{uint8}\PYG{p}{)}
+  \PYG{n}{depth\PYGZus{}vals\PYGZus{}veh} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{bitwise\PYGZus{}and}\PYG{p}{(}\PYG{n}{objects\PYGZus{}depth}\PYG{p}{,} \PYG{n}{veh}\PYG{p}{)}
+  \PYG{n}{depth\PYGZus{}vals\PYGZus{}pol} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{bitwise\PYGZus{}and}\PYG{p}{(}\PYG{n}{objects\PYGZus{}depth}\PYG{p}{,} \PYG{n}{poles}\PYG{p}{)}
+  \PYG{n}{objects\PYGZus{}depth} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{bitwise\PYGZus{}or}\PYG{p}{(}\PYG{n}{depth\PYGZus{}vals\PYGZus{}veh}\PYG{p}{,} \PYG{n}{depth\PYGZus{}vals\PYGZus{}pol}\PYG{p}{)}
+  \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{fillPoly}\PYG{p}{(}\PYG{n}{objects\PYGZus{}depth}\PYG{p}{,} \PYG{n}{pts}\PYG{o}{=}\PYG{p}{[}\PYG{n}{contours}\PYG{p}{],} \PYG{n}{color}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)}
+  \PYG{k}{return} \PYG{n}{objects\PYGZus{}depth}
+
+\PYG{k}{def} \PYG{n+nf}{bounding\PYGZus{}box}\PYG{p}{(}\PYG{n}{min\PYGZus{}area}\PYG{p}{,} \PYG{n}{signals}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{,} \PYG{n}{x\PYGZus{}min\PYGZus{}thresh}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{):}
+  \PYG{n}{pq} \PYG{o}{=} \PYG{n}{PriorityQueue}\PYG{p}{()}
+  \PYG{k}{if} \PYG{n}{signals}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{()} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{:}  \PYG{c+c1}{\PYGZsh{} Comprobar si contiene semáforos}
+    \PYG{n}{bbox} \PYG{o}{=} \PYG{n}{find\PYGZus{}contours}\PYG{p}{(}\PYG{n}{signals}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{,} \PYG{n}{x\PYGZus{}min\PYGZus{}thresh}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2} \PYG{o+ow}{in} \PYG{n}{bbox}\PYG{p}{:}
+      \PYG{n}{area} \PYG{o}{=} \PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{x1} \PYG{o}{\PYGZhy{}} \PYG{n}{x2}\PYG{p}{)}\PYG{o}{*}\PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{y1} \PYG{o}{\PYGZhy{}} \PYG{n}{y2}\PYG{p}{)}
+      \PYG{k}{if} \PYG{n}{area} \PYG{o}{\PYGZgt{}} \PYG{n}{min\PYGZus{}area} \PYG{o+ow}{and} \PYG{n}{x1} \PYG{o}{\PYGZgt{}} \PYG{n}{x\PYGZus{}min\PYGZus{}thresh}\PYG{p}{:}
+        \PYG{n}{pq}\PYG{o}{.}\PYG{n}{push}\PYG{p}{((}\PYG{o}{\PYGZhy{}}\PYG{n}{area}\PYG{p}{,} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2}\PYG{p}{))}
+    \PYG{n}{valid} \PYG{o}{=} \PYG{n+nb+bp}{True} \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{pq}\PYG{o}{.}\PYG{n}{empty}\PYG{p}{()} \PYG{o+ow}{and} \PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{pq}\PYG{o}{.}\PYG{n}{top}\PYG{p}{()[}\PYG{l+m+mi}{0}\PYG{p}{])} \PYG{o}{\PYGZgt{}} \PYG{n}{min\PYGZus{}area} \PYG{k}{else} \PYG{n+nb+bp}{False}
+    \PYG{k}{if} \PYG{n}{valid}\PYG{p}{:}
+    \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2} \PYG{o}{=} \PYG{n}{pq}\PYG{o}{.}\PYG{n}{top}\PYG{p}{()}
+    \PYG{n}{x}\PYG{p}{,} \PYG{n}{y} \PYG{o}{=} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n}{x1}\PYG{p}{),} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n}{y1}\PYG{p}{)}
+    \PYG{n}{w}\PYG{p}{,} \PYG{n}{h} \PYG{o}{=} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{x1} \PYG{o}{\PYGZhy{}} \PYG{n}{x2}\PYG{p}{)),} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{y1} \PYG{o}{\PYGZhy{}} \PYG{n}{y2}\PYG{p}{))}
+        \PYG{k}{return} \PYG{n}{x}\PYG{p}{,} \PYG{n}{y}\PYG{p}{,} \PYG{n}{w}\PYG{p}{,} \PYG{n}{h}
+  \PYG{k}{return} \PYG{n+nb+bp}{None}
+
+\PYG{k}{def} \PYG{n+nf}{cluster}\PYG{p}{(}\PYG{n}{crop}\PYG{p}{,} \PYG{n}{color\PYGZus{}code}\PYG{p}{):}
+  \PYG{n}{cod\PYGZus{}val} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}na\PYGZsq{}}
+  \PYG{n}{inp} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{float32}\PYG{p}{(}\PYG{n}{crop}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{((}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{3}\PYG{p}{)))}
+  \PYG{n}{criteria} \PYG{o}{=} \PYG{p}{(}\PYG{n}{cv2}\PYG{o}{.}\PYG{n}{TERM\PYGZus{}CRITERIA\PYGZus{}EPS} \PYG{o}{+} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{TERM\PYGZus{}CRITERIA\PYGZus{}MAX\PYGZus{}ITER}\PYG{p}{,} \PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mf}{1.0}\PYG{p}{)}
+  \PYG{n}{K} \PYG{o}{=} \PYG{l+m+mi}{4}
+  \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{label}\PYG{p}{,} \PYG{n}{center} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{kmeans}\PYG{p}{(}\PYG{n}{inp}\PYG{p}{,} \PYG{n}{K}\PYG{p}{,} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{n}{criteria}\PYG{p}{,}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{KMEANS\PYGZus{}RANDOM\PYGZus{}CENTERS}\PYG{p}{)}
+  \PYG{n}{res} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{uint8}\PYG{p}{(}\PYG{n}{center}\PYG{p}{[}\PYG{n}{label}\PYG{o}{.}\PYG{n}{flatten}\PYG{p}{()])}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{((}\PYG{n}{crop}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{))}
+  \PYG{n}{res} \PYG{o}{=} \PYG{n}{res} \PYG{o}{*} \PYG{p}{(}\PYG{n}{res} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{200}\PYG{p}{)}
+  \PYG{n}{rgb\PYGZus{}sig} \PYG{o}{=} \PYG{p}{[}\PYG{n}{res}\PYG{p}{[:,} \PYG{p}{:,} \PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(),} \PYG{n}{res}\PYG{p}{[:,} \PYG{p}{:,} \PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(),} \PYG{n}{res}\PYG{p}{[:,} \PYG{p}{:,} \PYG{l+m+mi}{2}\PYG{p}{]}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{()]}
+  \PYG{n}{rc}\PYG{p}{,} \PYG{n}{gc}\PYG{p}{,} \PYG{n}{bc} \PYG{o}{=} \PYG{n}{rgb\PYGZus{}sig}
+  \PYG{k}{if} \PYG{n}{rc} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0} \PYG{o+ow}{and} \PYG{n}{gc} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{:}
+    \PYG{k}{if} \PYG{n}{bc} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{:}
+      \PYG{n}{cod\PYGZus{}val} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}g\PYGZsq{}}
+    \PYG{k}{else}\PYG{p}{:}
+      \PYG{n}{cod\PYGZus{}val} \PYG{o}{=} \PYG{n}{color\PYGZus{}code}\PYG{p}{[}\PYG{n}{np}\PYG{o}{.}\PYG{n}{argmax}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}sig}\PYG{p}{)]}
+  \PYG{k}{elif} \PYG{n}{rc} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0} \PYG{o+ow}{or} \PYG{n}{gc} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0} \PYG{o+ow}{or} \PYG{n}{bc} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{:}
+    \PYG{n}{cod\PYGZus{}val} \PYG{o}{=} \PYG{n}{color\PYGZus{}code}\PYG{p}{[}\PYG{n}{np}\PYG{o}{.}\PYG{n}{argmax}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}sig}\PYG{p}{)]}
+      \PYG{k}{return} \PYG{n}{cod\PYGZus{}val}\PYG{p}{,} \PYG{n}{res}\PYG{p}{,} \PYG{n}{rc}\PYG{p}{,} \PYG{n}{gc}\PYG{p}{,} \PYG{n}{bc}
+
+\PYG{n+nd}{@njit}
+\PYG{k}{def} \PYG{n+nf}{ff}\PYG{p}{(}\PYG{n}{mat}\PYG{p}{,} \PYG{n}{i}\PYG{p}{,} \PYG{n}{j}\PYG{p}{,} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{):}
+  \PYG{k}{if} \PYG{p}{(}\PYG{l+m+mi}{0} \PYG{o}{\PYGZlt{}=} \PYG{n}{i} \PYG{o}{\PYGZlt{}} \PYG{n}{mat}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])} \PYG{o+ow}{and} \PYG{p}{(}\PYG{l+m+mi}{0} \PYG{o}{\PYGZlt{}=} \PYG{n}{j} \PYG{o}{\PYGZlt{}} \PYG{n}{mat}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{])} \PYG{o+ow}{and} \PYG{n}{mat}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,} \PYG{n}{j}\PYG{p}{]} \PYG{o}{!=} \PYG{l+m+mi}{0}\PYG{p}{:}
+    \PYG{n}{mat}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,} \PYG{n}{j}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{n}{x1} \PYG{o}{=} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{x1}\PYG{p}{,} \PYG{n}{j}\PYG{p}{)}
+    \PYG{n}{y1} \PYG{o}{=} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{y1}\PYG{p}{,} \PYG{n}{i}\PYG{p}{)}
+    \PYG{n}{x2} \PYG{o}{=} \PYG{n+nb}{max}\PYG{p}{(}\PYG{n}{x2}\PYG{p}{,} \PYG{n}{j}\PYG{p}{)}
+    \PYG{n}{y2} \PYG{o}{=} \PYG{n+nb}{max}\PYG{p}{(}\PYG{n}{y2}\PYG{p}{,} \PYG{n}{i}\PYG{p}{)}
+
+    \PYG{k}{for} \PYG{n}{dx}\PYG{p}{,} \PYG{n}{dy} \PYG{o+ow}{in} \PYG{n}{directions}\PYG{p}{:}
+      \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2} \PYG{o}{=} \PYG{n}{ff}\PYG{p}{(}\PYG{n}{mat}\PYG{p}{,} \PYG{n}{i}\PYG{o}{+}\PYG{n}{dy}\PYG{p}{,} \PYG{n}{j}\PYG{o}{+}\PYG{n}{dx}\PYG{p}{,} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2}
+
+\PYG{n+nd}{@njit}
+\PYG{k}{def} \PYG{n+nf}{find\PYGZus{}contours}\PYG{p}{(}\PYG{n}{img}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{,} \PYG{n}{x\PYGZus{}min\PYGZus{}thresh}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{pad}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{copy}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{):}
+  \PYG{k}{if} \PYG{n}{copy}\PYG{p}{:}
+    \PYG{n}{local\PYGZus{}img} \PYG{o}{=} \PYG{n}{img}\PYG{o}{.}\PYG{n}{copy}\PYG{p}{()}
+  \PYG{k}{else}\PYG{p}{:}
+    \PYG{n}{local\PYGZus{}img} \PYG{o}{=} \PYG{n}{img}
+  \PYG{n}{boxes} \PYG{o}{=} \PYG{p}{[]}
+
+  \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{local\PYGZus{}img}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]):}
+    \PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{x\PYGZus{}min\PYGZus{}thresh}\PYG{p}{,} \PYG{n}{local\PYGZus{}img}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]):}
+      \PYG{k}{if} \PYG{n}{local\PYGZus{}img}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,} \PYG{n}{j}\PYG{p}{]} \PYG{o}{!=} \PYG{l+m+mi}{0}\PYG{p}{:}
+        \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2} \PYG{o}{=} \PYG{n}{ff}\PYG{p}{(}\PYG{n}{local\PYGZus{}img}\PYG{p}{,} \PYG{n}{i}\PYG{p}{,} \PYG{n}{j}\PYG{p}{,} 
+                            \PYG{n}{np}\PYG{o}{.}\PYG{n}{inf}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{inf}\PYG{p}{,} \PYG{o}{\PYGZhy{}}\PYG{n}{np}\PYG{o}{.}\PYG{n}{inf}\PYG{p}{,} \PYG{o}{\PYGZhy{}}\PYG{n}{np}\PYG{o}{.}\PYG{n}{inf}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{)}
+        \PYG{n}{boxes}\PYG{o}{.}\PYG{n}{append}\PYG{p}{((}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n+nb}{max}\PYG{p}{(}\PYG{n}{x1}\PYG{o}{\PYGZhy{}}\PYG{n}{pad}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{)),}
+               \PYG{n+nb}{int}\PYG{p}{(}\PYG{n+nb}{max}\PYG{p}{(}\PYG{n}{y1}\PYG{o}{\PYGZhy{}}\PYG{n}{pad}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{)),} 
+               \PYG{n+nb}{int}\PYG{p}{(}\PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{x2}\PYG{o}{+}\PYG{n}{pad}\PYG{p}{,} \PYG{n}{local\PYGZus{}img}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{])),}
+               \PYG{n+nb}{int}\PYG{p}{(}\PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{y2}\PYG{o}{+}\PYG{n}{pad}\PYG{p}{,} \PYG{n}{local\PYGZus{}img}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]))))}
+
+  \PYG{c+c1}{\PYGZsh{} retorna en formato x1, y1, x2, y2}
+  \PYG{k}{return} \PYG{n}{boxes}
+
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZsq{}}\PYG{p}{:}
+  \PYG{k}{try}\PYG{p}{:}
+      \PYG{n}{actor\PYGZus{}list} \PYG{o}{=} \PYG{p}{[]}
+
+  \PYG{c+c1}{\PYGZsh{} 1. Definir la pantalla de visualización de imágenes mediante la librería PyGame.}
+    \PYG{n}{w}\PYG{p}{,} \PYG{n}{h} \PYG{o}{=} \PYG{l+m+mi}{240}\PYG{p}{,} \PYG{l+m+mi}{180}
+    \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{init}\PYG{p}{()}
+    \PYG{n}{display} \PYG{o}{=} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{display}\PYG{o}{.}\PYG{n}{set\PYGZus{}mode}\PYG{p}{((}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{w}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{h}\PYG{p}{),} 
+                                      \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{HWSURFACE} \PYG{o}{|} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{DOUBLEBUF}\PYG{p}{)}
+    \PYG{n}{clock} \PYG{o}{=} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{time}\PYG{o}{.}\PYG{n}{Clock}\PYG{p}{()}
+
+    \PYG{k}{try}\PYG{p}{:}
+  \PYG{c+c1}{\PYGZsh{} 2. Conectar con el simulador e inicializar el vehículo en el mapa.}
+      \PYG{n}{client} \PYG{o}{=} \PYG{n}{carla}\PYG{o}{.}\PYG{n}{Client}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}localhost\PYGZsq{}}\PYG{p}{,} \PYG{l+m+mi}{2000}\PYG{p}{)}
+      \PYG{n}{client}\PYG{o}{.}\PYG{n}{set\PYGZus{}timeout}\PYG{p}{(}\PYG{l+m+mf}{2.0}\PYG{p}{)}
+
+      \PYG{n}{world} \PYG{o}{=} \PYG{n}{client}\PYG{o}{.}\PYG{n}{get\PYGZus{}world}\PYG{p}{()}
+      \PYG{n}{player} \PYG{o}{=} \PYG{n}{spawn\PYGZus{}player}\PYG{p}{(}\PYG{n}{world}\PYG{p}{)}
+      \PYG{n}{actor\PYGZus{}list}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{player}\PYG{p}{)}
+
+      \PYG{n}{set\PYGZus{}random\PYGZus{}weather}\PYG{p}{(}\PYG{n}{world}\PYG{p}{)}
+
+      \PYG{n}{blueprint\PYGZus{}library} \PYG{o}{=} \PYG{n}{world}\PYG{o}{.}\PYG{n}{get\PYGZus{}blueprint\PYGZus{}library}\PYG{p}{()}
+          \PYG{n}{font} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{FONT\PYGZus{}HERSHEY\PYGZus{}SIMPLEX}
+
+      \PYG{n}{cam\PYGZus{}pos} \PYG{o}{=} \PYG{n}{carla}\PYG{o}{.}\PYG{n}{Transform}\PYG{p}{(}\PYG{n}{carla}\PYG{o}{.}\PYG{n}{Location}\PYG{p}{(}\PYG{n}{x}\PYG{o}{=}\PYG{l+m+mf}{1.6}\PYG{p}{,} \PYG{n}{z}\PYG{o}{=}\PYG{l+m+mf}{1.7}\PYG{p}{))}
+      \PYG{n}{camera\PYGZus{}rgb} \PYG{o}{=} \PYG{n}{create\PYGZus{}camera}\PYG{p}{(}\PYG{n}{cam\PYGZus{}type}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}rgb\PYGZsq{}}\PYG{p}{,}
+                   \PYG{n}{vehicle}\PYG{o}{=}\PYG{n}{player}\PYG{p}{,}
+                   \PYG{n}{pos}\PYG{o}{=}\PYG{n}{cam\PYGZus{}pos}\PYG{p}{,}
+                   \PYG{n}{h}\PYG{o}{=}\PYG{n}{h}\PYG{p}{,} \PYG{n}{w}\PYG{o}{=}\PYG{n}{w}\PYG{p}{,}
+                   \PYG{n}{lib}\PYG{o}{=}\PYG{n}{blueprint\PYGZus{}library}\PYG{p}{,}
+                   \PYG{n}{world}\PYG{o}{=}\PYG{n}{world}\PYG{p}{)}
+
+      \PYG{n}{actor\PYGZus{}list}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{camera\PYGZus{}rgb}\PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} 3. Cargar los parámetros de las redes.}
+      \PYG{n}{model\PYGZus{}depth} \PYG{o}{=} \PYG{n}{load\PYGZus{}network}\PYG{p}{(}\PYG{n}{CustomMobilenetDepth}\PYG{p}{,} 
+                   \PYG{l+s+s1}{\PYGZsq{}path/to/weights,}
+                   \PYG{p}{(}\PYG{l+m+mi}{180}\PYG{p}{,} \PYG{l+m+mi}{240}\PYG{p}{),} \PYG{n+nb+bp}{False}\PYG{p}{)}
+
+      \PYG{n}{normalize} \PYG{o}{=} \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{Normalize}\PYG{p}{(}\PYG{n}{mean}\PYG{o}{=}\PYG{p}{[}\PYG{l+m+mf}{0.485}\PYG{p}{,} \PYG{l+m+mf}{0.456}\PYG{p}{,} \PYG{l+m+mf}{0.406}\PYG{p}{],}
+                    \PYG{n}{std}\PYG{o}{=}\PYG{p}{[}\PYG{l+m+mf}{0.229}\PYG{p}{,} \PYG{l+m+mf}{0.224}\PYG{p}{,} \PYG{l+m+mf}{0.225}\PYG{p}{])}
+      \PYG{n}{depth\PYGZus{}preprocess} \PYG{o}{=} \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{Compose}\PYG{p}{([}
+        \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{ToTensor}\PYG{p}{(),}
+        \PYG{k}{lambda} \PYG{n}{T}\PYG{p}{:} \PYG{n}{T}\PYG{p}{[:}\PYG{l+m+mi}{3}\PYG{p}{],}
+        \PYG{n}{normalize}
+      \PYG{p}{])}
+
+      \PYG{n}{model\PYGZus{}drive} \PYG{o}{=} \PYG{n}{load\PYGZus{}network}\PYG{p}{(}\PYG{n}{CustomMobileNet}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}path/to/weights\PYGZsq{}}\PYG{p}{)}
+
+      \PYG{n}{drive\PYGZus{}preprocess} \PYG{o}{=} \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{Compose}\PYG{p}{([}
+        \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{Resize}\PYG{p}{((}\PYG{l+m+mi}{224}\PYG{p}{,} \PYG{l+m+mi}{224}\PYG{p}{),} \PYG{n}{interpolation}\PYG{o}{=}\PYG{n}{Image}\PYG{o}{.}\PYG{n}{BICUBIC}\PYG{p}{),}
+        \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{ToTensor}\PYG{p}{(),}
+      \PYG{p}{])}
+
+      \PYG{n}{model\PYGZus{}semseg} \PYG{o}{=} \PYG{n}{load\PYGZus{}network}\PYG{p}{(}\PYG{n}{CustomMobilenetSemseg}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}path/to/weights\PYGZsq{}}\PYG{p}{,} 
+                                  \PYG{p}{(}\PYG{l+m+mi}{180}\PYG{p}{,} \PYG{l+m+mi}{240}\PYG{p}{),} \PYG{n+nb+bp}{False}\PYG{p}{)}
+
+      \PYG{k}{with} \PYG{n}{CarlaSyncMode}\PYG{p}{(}\PYG{n}{world}\PYG{p}{,} \PYG{n}{camera\PYGZus{}rgb}\PYG{p}{,} \PYG{n}{fps}\PYG{o}{=}\PYG{l+m+mi}{30}\PYG{p}{)} \PYG{k}{as} \PYG{n}{sync\PYGZus{}mode}\PYG{p}{:}
+        \PYG{n}{road\PYGZus{}id}\PYG{p}{,} \PYG{n}{lane\PYGZus{}id} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}
+        \PYG{n}{action} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{]}
+
+        \PYG{n}{mutable\PYGZus{}params} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}ema\PYGZsq{}}\PYG{p}{:} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}alpha\PYGZsq{}}\PYG{p}{:} \PYG{l+m+mf}{0.75}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}ac\PYGZsq{}}\PYG{p}{:} \PYG{l+m+mi}{0}\PYG{p}{,} 
+                          \PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{:} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}t\PYGZsq{}}\PYG{p}{:} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}b\PYGZsq{}}\PYG{p}{:} \PYG{l+m+mi}{0}\PYG{p}{\PYGZcb{}}
+
+        \PYG{n}{threshold} \PYG{o}{=} \PYG{l+m+mf}{0.2}
+        \PYG{n}{min\PYGZus{}area} \PYG{o}{=} \PYG{l+m+mi}{95}
+        \PYG{n}{x\PYGZus{}min\PYGZus{}thresh} \PYG{o}{=} \PYG{l+m+mi}{120}
+        \PYG{n}{color\PYGZus{}code} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}r\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}g\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}b\PYGZsq{}}\PYG{p}{]}
+
+  \PYG{c+c1}{\PYGZsh{} 4. Iniciar un bucle de iteraciones de la simulación a 30 fps.}
+        \PYG{k}{while} \PYG{n+nb+bp}{True}\PYG{p}{:}
+          \PYG{k}{if} \PYG{n}{should\PYGZus{}quit}\PYG{p}{():}
+            \PYG{k}{return}
+          \PYG{n}{clock}\PYG{o}{.}\PYG{n}{tick}\PYG{p}{()}
+
+          \PYG{c+c1}{\PYGZsh{} Avanzar un tick de la simulación}
+          \PYG{n}{snapshot}\PYG{p}{,} \PYG{n}{image\PYGZus{}rgb} \PYG{o}{=} \PYG{n}{sync\PYGZus{}mode}\PYG{o}{.}\PYG{n}{tick}\PYG{p}{(}\PYG{n}{timeout}\PYG{o}{=}\PYG{l+m+mf}{2.0}\PYG{p}{)}
+
+          \PYG{c+c1}{\PYGZsh{} Convertir a un arreglo BGR}
+          \PYG{n}{rgb\PYGZus{}arr} \PYG{o}{=} \PYG{n}{img\PYGZus{}to\PYGZus{}array}\PYG{p}{(}\PYG{n}{image\PYGZus{}rgb}\PYG{p}{)}
+
+          \PYG{c+c1}{\PYGZsh{} Convertir a RGB}
+          \PYG{n}{X\PYGZus{}img} \PYG{o}{=} \PYG{n}{Image}\PYG{o}{.}\PYG{n}{fromarray}\PYG{p}{(}\PYG{n}{cv2}\PYG{o}{.}\PYG{n}{cvtColor}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{COLOR\PYGZus{}BGR2RGB}\PYG{p}{))}
+          \PYG{n}{X\PYGZus{}drive} \PYG{o}{=} \PYG{n}{drive\PYGZus{}preprocess}\PYG{p}{(}\PYG{n}{X\PYGZus{}img}\PYG{p}{)}\PYG{o}{.}\PYG{n}{view}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{l+m+mi}{224}\PYG{p}{,} \PYG{l+m+mi}{224}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{()}
+          \PYG{n}{X\PYGZus{}depth} \PYG{o}{=} \PYG{n}{depth\PYGZus{}preprocess}\PYG{p}{(}\PYG{n}{X\PYGZus{}img}\PYG{p}{)}\PYG{o}{.}\PYG{n}{view}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{l+m+mi}{180}\PYG{p}{,} \PYG{l+m+mi}{240}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{()}
+
+          \PYG{n}{position} \PYG{o}{=} \PYG{n}{player}\PYG{o}{.}\PYG{n}{get\PYGZus{}location}\PYG{p}{()}
+  \PYG{c+c1}{\PYGZsh{} 5. Verifica con el simulador si está en una intersección y decide el camino}
+          \PYG{n}{road\PYGZus{}id}\PYG{p}{,} \PYG{n}{lane\PYGZus{}id}\PYG{p}{,} \PYG{n}{action} \PYG{o}{=} \PYG{n}{take\PYGZus{}action}\PYG{p}{(}\PYG{n}{world}\PYG{p}{,} \PYG{n}{junction\PYGZus{}data}\PYG{p}{,} \PYG{n}{road\PYGZus{}id}\PYG{p}{,}
+                                                 \PYG{n}{lane\PYGZus{}id}\PYG{p}{,} \PYG{n}{action}\PYG{p}{,} \PYG{n}{position}\PYG{p}{)}
+          \PYG{n}{action\PYGZus{}tensor} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{tensor}\PYG{p}{(}\PYG{n}{action}\PYG{p}{)}\PYG{o}{.}\PYG{n}{view}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{()}
+
+  \PYG{c+c1}{\PYGZsh{} 6. Ingresar los valores de entrada a cada red neuronal y recibir su salida.}
+          \PYG{k}{with} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{no\PYGZus{}grad}\PYG{p}{():}
+            \PYG{n}{pred\PYGZus{}drive} \PYG{o}{=} \PYG{n}{model\PYGZus{}drive}\PYG{p}{(}\PYG{n}{X\PYGZus{}drive}\PYG{p}{,} \PYG{n}{action\PYGZus{}tensor}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cpu}\PYG{p}{()}
+            \PYG{n}{depth\PYGZus{}map} \PYG{o}{=} \PYG{n}{model\PYGZus{}depth}\PYG{p}{(}\PYG{n}{X\PYGZus{}depth}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cpu}\PYG{p}{()}\PYG{o}{.}\PYG{n}{numpy}\PYG{p}{()}
+            \PYG{n}{segmentation} \PYG{o}{=} \PYG{n}{model\PYGZus{}semseg}\PYG{p}{(}\PYG{n}{X\PYGZus{}drive}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cpu}\PYG{p}{()}\PYG{o}{.}\PYG{n}{numpy}\PYG{p}{()[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYGZbs{}
+                                                      \PYG{o}{.}\PYG{n}{argmax}\PYG{p}{(}\PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{uint8}\PYG{p}{)}
+
+          \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}t\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{pred\PYGZus{}drive}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]),} \PYG{l+m+mi}{3}\PYG{p}{)}
+          \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{pred\PYGZus{}drive}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{]),} \PYG{l+m+mi}{3}\PYG{p}{)}
+          \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}t\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}t\PYGZsq{}}\PYG{p}{],} \PYG{l+m+mf}{0.5}\PYG{p}{)}
+
+
+  \PYG{c+c1}{\PYGZsh{} 7. Corregir las oscilaciones con EMA.}
+  \PYG{c+c1}{\PYGZsh{} 8. Si el vehículo gira lo suficiente, se da un impulso mediante un acumulador.}
+          \PYG{n}{action\PYGZus{}str}\PYG{p}{,} \PYG{n}{ema\PYGZus{}str} \PYG{o}{=} \PYG{n}{steer\PYGZus{}correction}\PYG{p}{(}\PYG{n}{action}\PYG{p}{,} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{,} \PYG{n}{threshold}\PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} 9. Se procesan las predicciones de la segmentación semántica para obstáculos.}
+          \PYG{n}{walkers} \PYG{o}{=} \PYG{n}{get\PYGZus{}class\PYGZus{}semseg}\PYG{p}{(}\PYG{n}{segmentation}\PYG{p}{,} \PYG{l+m+mi}{4}\PYG{p}{)}
+          \PYG{n}{vehicles} \PYG{o}{=} \PYG{n}{get\PYGZus{}class\PYGZus{}semseg}\PYG{p}{(}\PYG{n}{segmentation}\PYG{p}{,} \PYG{l+m+mi}{10}\PYG{p}{)}
+          \PYG{n}{poles} \PYG{o}{=} \PYG{n}{get\PYGZus{}class\PYGZus{}semseg}\PYG{p}{(}\PYG{n}{segmentation}\PYG{p}{,} \PYG{l+m+mi}{5}\PYG{p}{)}
+
+          \PYG{n}{v\PYGZus{}boxes} \PYG{o}{=} \PYG{n}{find\PYGZus{}contours}\PYG{p}{(}\PYG{n}{vehicles}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{,} \PYG{n}{pad}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{copy}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+          \PYG{n}{w\PYGZus{}boxes} \PYG{o}{=} \PYG{n}{find\PYGZus{}contours}\PYG{p}{(}\PYG{n}{walkers}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{,} \PYG{n}{pad}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{copy}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+          \PYG{n}{p\PYGZus{}boxes} \PYG{o}{=} \PYG{n}{find\PYGZus{}contours}\PYG{p}{(}\PYG{n}{poles}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{,} \PYG{n}{pad}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{copy}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+
+          \PYG{n}{objects\PYGZus{}depth} \PYG{o}{=} \PYG{n}{extract\PYGZus{}objects\PYGZus{}depth}\PYG{p}{(}\PYG{n}{depth\PYGZus{}map}\PYG{p}{,} \PYG{n}{contours}\PYG{p}{,} 
+                                                \PYG{n}{vehicles}\PYG{p}{,} \PYG{n}{poles}\PYG{p}{,} \PYG{n}{walkers}\PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} 10. Se calcula la moda de las distancias de objetos cercanos.}
+          \PYG{k}{if} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{objects\PYGZus{}depth}\PYG{p}{)} \PYG{o}{!=} \PYG{l+m+mi}{0}\PYG{p}{:}
+            \PYG{n}{c} \PYG{o}{=} \PYG{n+nb}{sorted}\PYG{p}{(}\PYG{n}{Counter}\PYG{p}{(}\PYG{n+nb}{list}\PYG{p}{(}\PYG{n}{objects\PYGZus{}depth}\PYG{o}{.}\PYG{n}{ravel}\PYG{p}{()))}\PYG{o}{.}\PYG{n}{items}\PYG{p}{(),} 
+                       \PYG{n}{key}\PYG{o}{=}\PYG{k}{lambda} \PYG{n}{x}\PYG{p}{:} \PYG{o}{\PYGZhy{}}\PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{])}
+            \PYG{k}{if} \PYG{n}{c}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{][}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{:}
+              \PYG{n}{moda} \PYG{o}{=} \PYG{n}{c}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{][}\PYG{l+m+mi}{0}\PYG{p}{]}
+              \PYG{n}{count} \PYG{o}{=} \PYG{n}{c}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{][}\PYG{l+m+mi}{1}\PYG{p}{]}
+            \PYG{k}{else}\PYG{p}{:}
+              \PYG{n}{moda} \PYG{o}{=} \PYG{n}{c}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{][}\PYG{l+m+mi}{0}\PYG{p}{]}
+              \PYG{n}{count} \PYG{o}{=} \PYG{n}{c}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{][}\PYG{l+m+mi}{1}\PYG{p}{]}
+          \PYG{k}{else}\PYG{p}{:}
+            \PYG{n}{moda} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{inf}
+            \PYG{n}{count} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{inf}
+
+          \PYG{k}{if} \PYG{n}{moda} \PYG{o}{\PYGZlt{}=} \PYG{l+m+mi}{4} \PYG{o+ow}{and} \PYG{l+m+mi}{40} \PYG{o}{\PYGZlt{}=} \PYG{n}{count} \PYG{o}{\PYGZlt{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{inf}\PYG{p}{:}
+            \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{],} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}t\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}
+            \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}b\PYGZsq{}}\PYG{p}{]} \PYG{o}{+=} \PYG{l+m+mf}{0.10}
+            \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}b\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{min}\PYG{p}{(}\PYG{n+nb}{max}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}b\PYGZsq{}}\PYG{p}{]),} \PYG{l+m+mi}{1}\PYG{p}{),} \PYG{l+m+mi}{3}\PYG{p}{)}
+          \PYG{k}{else}\PYG{p}{:}
+            \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}b\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+
+  \PYG{c+c1}{\PYGZsh{} 11.  Se detecta la posición de los semáforos.}
+          \PYG{n}{signals} \PYG{o}{=} \PYG{n}{get\PYGZus{}class\PYGZus{}semseg}\PYG{p}{(}\PYG{n}{segmentation}\PYG{p}{,} \PYG{l+m+mi}{12}\PYG{p}{)}
+          \PYG{n}{box} \PYG{o}{=} \PYG{n}{bounding\PYGZus{}box}\PYG{p}{(}\PYG{n}{min\PYGZus{}area}\PYG{p}{,} \PYG{n}{signals}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{,} \PYG{n}{x\PYGZus{}min\PYGZus{}thresh}\PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} 12. Se predice un código de color, r para rojo o g para verde.}
+          \PYG{n}{code\PYGZus{}val} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}na\PYGZsq{}}
+          \PYG{n}{signal\PYGZus{}img} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{((}\PYG{l+m+mi}{180}\PYG{p}{,} \PYG{l+m+mi}{60}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{))}
+          \PYG{n}{rc}\PYG{p}{,} \PYG{n}{gc}\PYG{p}{,} \PYG{n}{bc} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}
+          \PYG{n}{k\PYGZus{}img} \PYG{o}{=} \PYG{n+nb+bp}{None}
+          \PYG{k}{if} \PYG{n+nb}{isinstance}\PYG{p}{(}\PYG{n}{box}\PYG{p}{,} \PYG{n+nb}{tuple}\PYG{p}{):}
+            \PYG{n}{x}\PYG{p}{,} \PYG{n}{y}\PYG{p}{,} \PYG{n}{w}\PYG{p}{,} \PYG{n}{h} \PYG{o}{=} \PYG{n}{box}
+            \PYG{n}{crop} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{resize}\PYG{p}{(}\PYG{n}{cv2}\PYG{o}{.}\PYG{n}{cvtColor}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{[}\PYG{n}{y}\PYG{p}{:}\PYG{n}{y}\PYG{o}{+}\PYG{n}{h}\PYG{p}{,} \PYG{n}{x}\PYG{p}{:}\PYG{n}{x}\PYG{o}{+}\PYG{n}{w}\PYG{p}{,} \PYG{p}{:],} 
+                                           \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{COLOR\PYGZus{}BGR2RGB}\PYG{p}{),} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{n}{fx}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{,} \PYG{n}{fy}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{)}
+            \PYG{c+c1}{\PYGZsh{} K\PYGZhy{}MEANS}
+            \PYG{n}{code\PYGZus{}val}\PYG{p}{,} \PYG{n}{k\PYGZus{}img}\PYG{p}{,} \PYG{n}{rc}\PYG{p}{,} \PYG{n}{gc}\PYG{p}{,} \PYG{n}{bc} \PYG{o}{=} \PYG{n}{cluster}\PYG{p}{(}\PYG{n}{crop}\PYG{p}{,} \PYG{n}{color\PYGZus{}code}\PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} 13. Se usa el código de color para decidir si frenar o no.}
+          \PYG{k}{if} \PYG{n}{code\PYGZus{}val} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}r\PYGZsq{}}\PYG{p}{:}
+            \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}b\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{1}
+            \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+            \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}t\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+
+  \PYG{c+c1}{\PYGZsh{} 14. Se envían las decisiones finales de control al vehículo.}
+          \PYG{n}{player}\PYG{o}{.}\PYG{n}{apply\PYGZus{}control}\PYG{p}{(}\PYG{n}{carla}\PYG{o}{.}\PYG{n}{VehicleControl}\PYG{p}{(}\PYG{n}{throttle}\PYG{o}{=} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}t\PYGZsq{}}\PYG{p}{],} 
+                               \PYG{n}{steer}\PYG{o}{=} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}s\PYGZsq{}}\PYG{p}{],} 
+                               \PYG{n}{brake}\PYG{o}{=} \PYG{n}{mutable\PYGZus{}params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}b\PYGZsq{}}\PYG{p}{]))}
+          \PYG{n}{line1} \PYG{o}{=} \PYG{n}{f}\PYG{l+s+s2}{\PYGZdq{}t: \PYGZob{}round(mutable\PYGZus{}params[\PYGZsq{}t\PYGZsq{}], 2)\PYGZcb{} }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{l+s+s2}{                    b: \PYGZob{}round(mutable\PYGZus{}params[\PYGZsq{}b\PYGZsq{}], 2)\PYGZcb{} }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{l+s+s2}{                    s: \PYGZob{}round(mutable\PYGZus{}params[\PYGZsq{}s\PYGZsq{}], 2)\PYGZcb{} }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{l+s+s2}{                    color: \PYGZob{}code\PYGZus{}val\PYGZcb{}\PYGZdq{}}
+          \PYG{n}{line2} \PYG{o}{=} \PYG{n}{f}\PYG{l+s+s2}{\PYGZdq{}moda: \PYGZob{}moda\PYGZcb{}, r: \PYGZob{}int(rc\PYGZgt{}0)\PYGZcb{} g: \PYGZob{}int(gc\PYGZgt{}0)\PYGZcb{} b: \PYGZob{}int(bc\PYGZgt{}0)\PYGZcb{}\PYGZdq{}}
+          \PYG{n}{line3} \PYG{o}{=} \PYG{n}{f}\PYG{l+s+s2}{\PYGZdq{}act: \PYGZob{}action\PYGZus{}str\PYGZcb{} \PYGZob{}action\PYGZcb{}\PYGZdq{}}        
+          \PYG{n}{rgb\PYGZus{}arr} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{resize}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{,} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{n}{fx}\PYG{o}{=}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{fy}\PYG{o}{=}\PYG{l+m+mi}{2}\PYG{p}{,} 
+                               \PYG{n}{interpolation}\PYG{o}{=}\PYG{n}{cv2}\PYG{o}{.}\PYG{n}{INTER\PYGZus{}CUBIC}\PYG{p}{)}
+          \PYG{n}{pos1} \PYG{o}{=} \PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{30}\PYG{p}{)}
+          \PYG{n}{pos2} \PYG{o}{=} \PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{60}\PYG{p}{)}
+          \PYG{n}{black}\PYG{p}{,} \PYG{n}{green} \PYG{o}{=} \PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{),} \PYG{p}{(}\PYG{l+m+mi}{156}\PYG{p}{,} \PYG{l+m+mi}{237}\PYG{p}{,} \PYG{l+m+mi}{58}\PYG{p}{)}
+          \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{putText}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{,} \PYG{n}{line1}\PYG{p}{,} \PYG{n}{pos1}\PYG{p}{,} \PYG{n}{font}\PYG{p}{,} \PYG{l+m+mf}{0.6}\PYG{p}{,} \PYG{n}{black}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{LINE\PYGZus{}AA}\PYG{p}{)}
+          \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{putText}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{,} \PYG{n}{line1}\PYG{p}{,} \PYG{n}{pos1}\PYG{p}{,} \PYG{n}{font}\PYG{p}{,} \PYG{l+m+mf}{0.6}\PYG{p}{,} \PYG{n}{green}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{LINE\PYGZus{}AA}\PYG{p}{)}
+          \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{putText}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{,} \PYG{n}{line2}\PYG{p}{,} \PYG{n}{pos2}\PYG{p}{,} \PYG{n}{font}\PYG{p}{,} \PYG{l+m+mf}{0.6}\PYG{p}{,} \PYG{n}{black}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{LINE\PYGZus{}AA}\PYG{p}{)}
+          \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{putText}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{,} \PYG{n}{line2}\PYG{p}{,} \PYG{n}{pos2}\PYG{p}{,} \PYG{n}{font}\PYG{p}{,} \PYG{l+m+mf}{0.6}\PYG{p}{,} \PYG{n}{green}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{LINE\PYGZus{}AA}\PYG{p}{)}
+          \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{putText}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{,} \PYG{n}{line3}\PYG{p}{,} \PYG{n}{pos3}\PYG{p}{,} \PYG{n}{font}\PYG{p}{,} \PYG{l+m+mf}{0.6}\PYG{p}{,} \PYG{n}{black}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{LINE\PYGZus{}AA}\PYG{p}{)}
+          \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{putText}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{,} \PYG{n}{line3}\PYG{p}{,} \PYG{n}{pos3}\PYG{p}{,} \PYG{n}{font}\PYG{p}{,} \PYG{l+m+mf}{0.6}\PYG{p}{,} \PYG{n}{green}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{LINE\PYGZus{}AA}\PYG{p}{)}
+
+          \PYG{c+c1}{\PYGZsh{} visualización de los rectángulos delimitando los objetos}
+          \PYG{k}{if} \PYG{o+ow}{not} \PYG{n+nb}{isinstance}\PYG{p}{(}\PYG{n}{box}\PYG{p}{,} \PYG{n+nb}{type}\PYG{p}{(}\PYG{n+nb+bp}{None}\PYG{p}{)):}
+            \PYG{n}{color} \PYG{o}{=} \PYG{p}{(}\PYG{l+m+mi}{58}\PYG{p}{,} \PYG{l+m+mi}{58}\PYG{p}{,} \PYG{l+m+mi}{237}\PYG{p}{)} \PYG{k}{if} \PYG{n}{code\PYGZus{}val} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}r\PYGZsq{}} \PYG{k}{else} \PYG{p}{(}\PYG{l+m+mi}{58}\PYG{p}{,} \PYG{l+m+mi}{237}\PYG{p}{,} \PYG{l+m+mi}{67}\PYG{p}{)}
+            \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{rectangle}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{,} \PYG{p}{(}\PYG{n}{box}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{box}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{),} 
+                          \PYG{p}{((}\PYG{n}{box}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{+}\PYG{n}{box}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{])}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{p}{(}\PYG{n}{box}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{+}\PYG{n}{box}\PYG{p}{[}\PYG{l+m+mi}{3}\PYG{p}{])}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{),} \PYG{n}{color}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{)}
+
+          \PYG{k}{for} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2} \PYG{o+ow}{in} \PYG{n}{v\PYGZus{}boxes}\PYG{p}{:}
+            \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{rectangle}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{,} \PYG{p}{(}\PYG{n}{x1}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{y1}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{),} \PYG{p}{(}\PYG{n}{x2}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{y2}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{),} \PYG{p}{(}\PYG{l+m+mi}{237}\PYG{p}{,} \PYG{l+m+mi}{152}\PYG{p}{,} \PYG{l+m+mi}{58}\PYG{p}{),} \PYG{l+m+mi}{2}\PYG{p}{)}
+          \PYG{k}{for} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2} \PYG{o+ow}{in} \PYG{n}{p\PYGZus{}boxes}\PYG{p}{:}
+            \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{rectangle}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{,} \PYG{p}{(}\PYG{n}{x1}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{y1}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{),} \PYG{p}{(}\PYG{n}{x2}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{y2}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{),} \PYG{p}{(}\PYG{l+m+mi}{115}\PYG{p}{,} \PYG{l+m+mi}{58}\PYG{p}{,} \PYG{l+m+mi}{237}\PYG{p}{),} \PYG{l+m+mi}{2}\PYG{p}{)}
+          \PYG{k}{for} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2} \PYG{o+ow}{in} \PYG{n}{w\PYGZus{}boxes}\PYG{p}{:}
+            \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{rectangle}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{p}{,} \PYG{p}{(}\PYG{n}{x1}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{y1}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{),} \PYG{p}{(}\PYG{n}{x2}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{y2}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{),} \PYG{p}{(}\PYG{l+m+mi}{58}\PYG{p}{,} \PYG{l+m+mi}{161}\PYG{p}{,} \PYG{l+m+mi}{237}\PYG{p}{),} \PYG{l+m+mi}{2}\PYG{p}{)}
+
+          \PYG{n}{show\PYGZus{}window}\PYG{p}{(}\PYG{n}{display}\PYG{p}{,} \PYG{n}{rgb\PYGZus{}arr}\PYG{p}{)}
+
+          \PYG{c+c1}{\PYGZsh{} visualizar el semáforo segmentado}
+          \PYG{k}{if} \PYG{o+ow}{not} \PYG{n+nb}{isinstance}\PYG{p}{(}\PYG{n}{k\PYGZus{}img}\PYG{p}{,} \PYG{n+nb}{type}\PYG{p}{(}\PYG{n+nb+bp}{None}\PYG{p}{)):}
+            \PYG{n}{k\PYGZus{}img} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{cvtColor}\PYG{p}{(}\PYG{n}{k\PYGZus{}img}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{COLOR\PYGZus{}RGB2BGR}\PYG{p}{)}
+            \PYG{n}{k\PYGZus{}img} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{resize}\PYG{p}{(}\PYG{n}{k\PYGZus{}img}\PYG{p}{,} \PYG{p}{(}\PYG{l+m+mi}{31}\PYG{p}{,} \PYG{l+m+mi}{55}\PYG{p}{),} \PYG{n}{interpolation}\PYG{o}{=}\PYG{n}{cv2}\PYG{o}{.}\PYG{n}{INTER\PYGZus{}CUBIC}\PYG{p}{)}
+            \PYG{n}{show\PYGZus{}window}\PYG{p}{(}\PYG{n}{display}\PYG{p}{,} \PYG{n}{k\PYGZus{}img}\PYG{p}{,} \PYG{p}{(}\PYG{n}{rgb\PYGZus{}arr}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{k\PYGZus{}img}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{l+m+mi}{0}\PYG{p}{))}
+
+          \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{display}\PYG{o}{.}\PYG{n}{flip}\PYG{p}{()}
+    \PYG{k}{finally}\PYG{p}{:}
+      \PYG{k}{for} \PYG{n}{actor} \PYG{o+ow}{in} \PYG{n}{actor\PYGZus{}list}\PYG{p}{:}
+        \PYG{n}{actor}\PYG{o}{.}\PYG{n}{destroy}\PYG{p}{()}
+      \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{quit}\PYG{p}{()}
+  \PYG{k}{except} \PYG{n+ne}{KeyboardInterrupt}\PYG{p}{:}
+    \PYG{k}{print}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s1}{Fin\PYGZsq{}}\PYG{p}{)}
+\end{Verbatim}

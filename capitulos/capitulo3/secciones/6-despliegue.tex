@@ -1,0 +1,72 @@
+\section{DESPLIEGUE}
+	Para realizar el despliegue del proyecto se implementa un script que se comunique con el simulador para extraer imágenes desde una cámara virtual hasta que el usuario detenga el procedimiento, para cada iteración de la simulación se realizan las predicciones en base al modelo propuesto y se adicionan funciones de visualización de las predicciones de las redes.
+	
+	Los pasos más importantes son:
+	\begin{enumerate}[nosep]
+		\item Definir la pantalla de visualización de imágenes mediante la librería PyGame.
+		\item Conectar con el simulador e inicializar el vehículo en el mapa con un clima aleatorio.
+		\item Cargar los parámetros de las redes.
+		\item Iniciar un bucle de iteraciones de la simulación a 30 fps.
+		\item Detectar si se está en una intersección mediante el simulador y decidir al azar qué camino tomar.
+		\item Ingresar los valores de entrada a cada red neuronal y recibir su salida.
+		\item Corregir las oscilaciones con EMA.
+		\item Si el vehículo no realiza alguna curva en intersección, se da un impulso mediante un acumulador de giro.
+		\item Se procesan las predicciones de la segmentación semántica para las clases vehículos y postes.
+		\item Se calcula la moda de las distancias de objetos cercanos.
+		\item Se detecta la posición de los semáforos.
+		\item Se predice un código de color, r para rojo o g para verde.
+		\item Se usa el código de color para decidir si frenar o no.
+		\item Se envían las decisiones finales de control al vehículo.
+	\end{enumerate}
+	
+	el código del script está listado en el anexo $F.3$.
+%	
+%	
+%	{\setstretch{1.0}
+%	\begin{algorithm}[H]
+%		\caption{\textit{Modelo de Conducción Autónoma}}
+%		\SetAlgoLined
+%		\KwData{$w:$ ancho de la imagen a mostrar}
+%		\KwData{$h:$ alto de la imagen a mostrar}
+%		\KwData{$drivepath:$ ubicación de los pesos de la DriveNet}
+%		\KwData{$depthpath:$ ubicación de los pesos de la DepthNet}
+%		\KwData{$semsegpath:$ ubicación de los pesos de la SemsegNet}
+%		\vspace{2mm}
+%		iniciar\_pygame($w$, $h$)\\
+%		cliente $\leftarrow$ conectar\_carla()\\
+%		mundo $\leftarrow$ conectar\_mundo()\\
+%		jugador $\leftarrow$ iniciar\_jugador()\\
+%		camara $\leftarrow$ crear\_cámara()\\
+%		\vspace{2mm}
+%		drive\_net $\leftarrow$ cargar($drivepath$)\\
+%		depth\_net $\leftarrow$ cargar($depthpath$)\\
+%		semseg\_net $\leftarrow$ cargar($semsegpath$)\\
+%		\vspace{2mm}
+%		ema $\leftarrow$ NULL\\
+%		$\alpha$ $\leftarrow$ 0.75\\
+%		giro $\leftarrow$ NULL\\
+%		acelerador $\leftarrow$ NULL\\
+%		freno $\leftarrow$ NULL\\
+%		\While{$\infty$}{
+%			img $\leftarrow$ obtener\_imagen(camara)
+%			img $\leftarrow$ pre\_procesar\_imagen(img)
+%			\tcc{obtener la posición y verificar si está en intersección}
+%			posicion $\leftarrow$ obtener\_posicion()
+%			accion $\leftarrow$ tomar\_accion(posicion)
+%			\tcc{predecir}
+%			acelerador, giro $\leftarrow$ drive\_net(img)
+%			distancias $\leftarrow$ depth\_net(img)
+%			segmentacion $\leftarrow$ semseg\_net(img)
+%			
+%			obstaculos $\leftarrow$ mascaras(segmentacion)
+%			obstaculos\_d $\leftarrow$ dist\_obstaculos(obstaculos, segmentación)
+%			
+%			distancia $\leftarrow$ calcular\_moda(obstaculos\_d)
+%			
+%			ema $\leftarrow$ estabilizar\_direccion(ema, giro)
+%			
+%			semaforos $\leftarrow$ rectangulos\_flood\_fill(semaforos)
+%			
+%		}
+%		
+%	\end{algorithm}

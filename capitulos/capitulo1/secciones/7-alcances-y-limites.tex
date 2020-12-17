@@ -1,0 +1,36 @@
+\section{ALCANCES Y LÍMITES}
+%\section[Alcances y Límites]{ALCANCES Y LÍMITES}
+	\subsection{ALCANCES}
+%	\subsection[Alcances]{ALCANCES}
+		\begin{itemize}[nosep]
+			\item Se define una red neuronal para predecir fin a fin la aceleración y dirección del vehículo dado un fotograma de la cámara.
+			\item El modelo contiente un módulo de estimación de distancias para evitar colisiones.
+			\item Se introduce un módulo de segmentación de objetos en la imagen.
+			\item Se implementa un algoritmo para la detección de objetos en base a las predicciones de las redes neuronales
+			\item El modelo contempla un módulo de clasificación de color de semáforos.
+		\end{itemize}
+	\subsection{LÍMITES}
+%	\subsection[Límites]{LÍMITES}
+		\begin{itemize}[nosep]
+			\item El modelo no empleará módulos que tengan como entrada otros sensores aparte de una cámara RGB.
+			\item Las predicciones del modelo no serán capaces de permitir cambios de carriles o adelantamientos.
+			\item Las calles sobre las que puede conducirse tienen un carril en cada dirección y están asfaltadas.
+			\item El modelo no es capaz de predecir correctamente en situaciones de lluvia extrema.
+			\item La generalización del modelo está limitada por la complejidad de las redes neuronales a favor de velocidad de cómputo.
+		\end{itemize}
+
+%    \subsection{ALCANCES}
+%    \begin{itemize}[nosep]
+%        \item El modelo permitirá procesar imágenes de tramos vehiculares para el entrenamiento de modelos.
+%        \item El modelo definirá arquitecturas de redes neuronales y algoritmos de visión computacional para la detección de carriles y circulación dentro de estos.
+%        \item El modelo permitirá entrenar redes neuronales para predecir la velocidad y la rotación de la dirección del vehículo dado un fotograma de la cámara.
+%        \item El modelo permitirá entrenar detectores de señales de tránsito para la toma de decisiones en base a estas.
+%        \item El modelo entrenará detectores de peatones y vehículos en el camino para evitar colisiones y accidentes.
+%        \item El modelo se probará en un simulador para comprobar su rendimiento en situaciones de caminos y pistas.
+%    \end{itemize}
+%    \subsection{LÍMITES}
+%    \begin{itemize}[nosep]
+%        \item El modelo no empleará modelos que tengan como entrada otros sensores aparte de cámaras RGB.
+%        \item El modelo con los modelos y algoritmos, busca una autonomía básica, por lo tanto no se conseguirá una autonomía total que funcione en todo tipo de condiciones.
+%        \item El modelo implementará algoritmos que no serán capaces de tomar decisiones avanzadas como cambios de carriles o adelantamientos.
+%    \end{itemize}

@@ -1,0 +1,27 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{cod} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}r\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}g\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}b\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{cod\PYGZus{}val} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}na\PYGZsq{}}
+
+\PYG{c+c1}{\PYGZsh{} En caso de que se detecte un semáforo y se recorte en la variable crop}
+\PYG{n}{inp} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{float32}\PYG{p}{(}\PYG{n}{crop}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{((}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{3}\PYG{p}{)))}
+\PYG{n}{criteria} \PYG{o}{=} \PYG{p}{(}\PYG{n}{cv2}\PYG{o}{.}\PYG{n}{TERM\PYGZus{}CRITERIA\PYGZus{}EPS} \PYG{o}{+} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{TERM\PYGZus{}CRITERIA\PYGZus{}MAX\PYGZus{}ITER}\PYG{p}{,} \PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mf}{1.0}\PYG{p}{)}
+\PYG{n}{K} \PYG{o}{=} \PYG{l+m+mi}{4}
+\PYG{c+c1}{\PYGZsh{} Label: id del cluster al que pertenece cada píxel de la imagen}
+\PYG{c+c1}{\PYGZsh{} Center: valores de los píxeles de los centros en cada canal}
+\PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{label}\PYG{p}{,} \PYG{n}{center} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{kmeans}\PYG{p}{(}\PYG{n}{inp}\PYG{p}{,} \PYG{n}{K}\PYG{p}{,} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{n}{criteria}\PYG{p}{,}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{KMEANS\PYGZus{}RANDOM\PYGZus{}CENTERS}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} Toma el id del cluster al que pertenece el píxel y le asigna el valor del centro}
+\PYG{n}{res} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{uint8}\PYG{p}{(}\PYG{n}{center}\PYG{p}{[}\PYG{n}{label}\PYG{o}{.}\PYG{n}{flatten}\PYG{p}{()])}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{((}\PYG{n}{crop}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{))} \PYG{c+c1}{\PYGZsh{} Reconstruye la imagen}
+\PYG{c+c1}{\PYGZsh{} Selecciona los valores de píxeles mayor a 200}
+\PYG{n}{res} \PYG{o}{=} \PYG{n}{res} \PYG{o}{*} \PYG{p}{(}\PYG{n}{res} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{200}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} Suma los pixeles mayores a 200}
+\PYG{n}{rgb\PYGZus{}sig} \PYG{o}{=} \PYG{p}{[}\PYG{n}{res}\PYG{p}{[:,} \PYG{p}{:,} \PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(),} \PYG{n}{res}\PYG{p}{[:,} \PYG{p}{:,} \PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(),} \PYG{n}{res}\PYG{p}{[:,} \PYG{p}{:,} \PYG{l+m+mi}{2}\PYG{p}{]}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{()]}
+\PYG{n}{rc}\PYG{p}{,} \PYG{n}{gc}\PYG{p}{,} \PYG{n}{bc} \PYG{o}{=} \PYG{n}{rgb\PYGZus{}sig}
+\PYG{c+c1}{\PYGZsh{} si los canales rojo y verde son mayores a cero}
+\PYG{k}{if} \PYG{n}{rc} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0} \PYG{o+ow}{and} \PYG{n}{gc} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{:}
+    \PYG{k}{if} \PYG{n}{bc} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{:} \PYG{c+c1}{\PYGZsh{} si lo es también azúl}
+        \PYG{n}{cod\PYGZus{}val} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}g\PYGZsq{}} \PYG{c+c1}{\PYGZsh{} es verde}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{n}{cod\PYGZus{}val} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}r\PYGZsq{}} \PYG{c+c1}{\PYGZsh{} sino es rojo}
+\PYG{k}{elif} \PYG{n}{rc} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0} \PYG{o+ow}{or} \PYG{n}{gc} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0} \PYG{o+ow}{or} \PYG{n}{bc} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{:} \PYG{c+c1}{\PYGZsh{} si alguno de los 3 es mayor a cero}
+    \PYG{n}{cod\PYGZus{}val} \PYG{o}{=} \PYG{n}{cod}\PYG{p}{[}\PYG{n}{np}\PYG{o}{.}\PYG{n}{argmax}\PYG{p}{(}\PYG{n}{rgb\PYGZus{}sig}\PYG{p}{)]} \PYG{c+c1}{\PYGZsh{} se toma el color con más ocurrencias}
+\end{Verbatim}

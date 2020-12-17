@@ -1,0 +1,28 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{alpha} \PYG{o}{=} \PYG{l+m+mf}{0.75}
+\PYG{n}{ema} \PYG{o}{=} \PYG{n+nb+bp}{None}
+\PYG{n}{threshold} \PYG{o}{=} \PYG{l+m+mf}{0.2}
+
+\PYG{k}{while} \PYG{n+nb+bp}{True}\PYG{p}{:}
+    \PYG{c+c1}{\PYGZsh{} ... código de control y predicción en cada iteración}
+
+    \PYG{c+c1}{\PYGZsh{} se obitnen las predicciones de cada red}
+    \PYG{n}{out} \PYG{o}{=} \PYG{n}{model\PYGZus{}drive}\PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{action\PYGZus{}tensor}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cpu}\PYG{p}{()}
+    \PYG{n}{depth\PYGZus{}map} \PYG{o}{=} \PYG{n}{model\PYGZus{}depth}\PYG{p}{(}\PYG{n}{X\PYGZus{}D}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cpu}\PYG{p}{()}\PYG{o}{.}\PYG{n}{numpy}\PYG{p}{()}
+    \PYG{n}{segmentation} \PYG{o}{=} \PYG{n}{model\PYGZus{}semseg}\PYG{p}{(}\PYG{n}{X}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cpu}\PYG{p}{()}\PYG{o}{.}\PYG{n}{numpy}\PYG{p}{()[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{argmax}\PYG{p}{(}\PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{uint8}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Redondeo de valores para reducir precisión y oscilaciones}
+    \PYG{c+c1}{\PYGZsh{} t: throttle (acelerador), s: (steer) dirección}
+    \PYG{n}{t}\PYG{p}{,} \PYG{n}{s} \PYG{o}{=} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{out}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]),} \PYG{l+m+mi}{3}\PYG{p}{),} \PYG{n+nb}{round}\PYG{p}{(}\PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{out}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{]),} \PYG{l+m+mi}{3}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} Limitación de la velocidad}
+    \PYG{n}{t} \PYG{o}{=} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{t}\PYG{p}{,} \PYG{l+m+mf}{0.5}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Si estamos fuera de una intersección}
+    \PYG{k}{if} \PYG{n+nb}{isinstance}\PYG{p}{(}\PYG{n}{ema}\PYG{p}{,} \PYG{n+nb}{type}\PYG{p}{(}\PYG{n+nb+bp}{None}\PYG{p}{)):}  \PYG{c+c1}{\PYGZsh{} Si ema está en t=0}
+        \PYG{n}{ema} \PYG{o}{=} \PYG{n}{s}                      \PYG{c+c1}{\PYGZsh{} inicializar}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{n}{ema} \PYG{o}{=} \PYG{n}{alpha}\PYG{o}{*}\PYG{n}{s} \PYG{o}{+} \PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{alpha}\PYG{p}{)}\PYG{o}{*}\PYG{n}{ema}  \PYG{c+c1}{\PYGZsh{} Dar un paso de EMA}
+
+    \PYG{k}{if} \PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{s}\PYG{p}{)} \PYG{o}{\PYGZlt{}=} \PYG{n}{threshold}\PYG{p}{:}  \PYG{c+c1}{\PYGZsh{} Si está en el rango}
+        \PYG{n}{s} \PYG{o}{=} \PYG{n}{ema}              \PYG{c+c1}{\PYGZsh{} Aplicar el valor del EMA}
+\end{Verbatim}

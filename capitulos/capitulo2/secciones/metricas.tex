@@ -1,0 +1,57 @@
+\section{MÉTRICAS DE ERROR}
+\subsection{ERROR CUADRÁTICO MEDIO}
+Al calcular la diferencia entre observaciones, es útil ponderar las distancias más grandes por sobre las distancias pequeñas, así se define el error cuadrático medio como:
+
+\begin{equation}
+	MSE = \frac{1}{n}\sum_{i=1}^n (\hat{y} - y)^2
+\end{equation}
+
+Ya que esta métrica se usa al comparar estimaciones y sus valores reales esperados, se denota por $\hat{y}$ a la predicción y $y$ al valor real \citep{hastie01statisticallearning}.
+
+\subsection{ERROR ABSOLUTO MEDIO}
+Debido a que el error cuadrático medio pondera de manera distinta cada diferencia, si bien es útil para minimizar errores de ajuste de modelos, es difícil de interpretar al reportar resultados, para esto se utiliza el error absoluto medio, también conocido como la media de la norma $\ell_1$, definido como:
+
+\begin{equation}
+	MSE = \frac{1}{n}\sum_{i=1}^n |\hat{y} - y|
+\end{equation}
+
+Esta función también se utiliza para ajustar modelos, sin embargo debido a la singularidad en el punto $0$, no es diferenciable en su dominio, por lo que dependiendo de la implementación se define una derivada en ese punto \citep{hastie01statisticallearning}.
+
+\subsection{PRECISIÓN Y EXHAUSTIVIDAD}
+% Con valor F
+Cuando en tareas de clasificación se tienen conjuntos de datos desbalanceados, un cálculo de probabilidad de exactitud no es representativo del rendimiento real del modelo, por lo que se aplican la precisión y exhaustividad.
+
+La precisión ($P$) se define como el número de positivos reales ($T_p$), dividido entre el total de verdaderos y falsos positivos $F_p$.
+
+\begin{equation}
+	P = \frac{T_p}{T_p + F_p}
+\end{equation}
+
+Una alta precisión indica que el umbral de clasificación es más estricto, por lo que pocos valores positivos se clasifican como tal, sin embargo los clasificados como positivo tienen una probabilidad alta de ser predicciones correctas.
+
+La exhaustividad ($R$) se define como el número de positivos reales, dividido entre la suma de verdaderos casos positivos y falsos negativos ($F_n$).
+
+\begin{equation}
+	R = \frac{T_p}{T_p + F_n}
+\end{equation}
+
+Una alta exhaustividad o recall, significa que el umbral de clasificación es más permisivo, sin embargo, debido a esto muchas de las predicciones positivas, son en realidad negativas, teniendo así un alto índice de falsos positivos.
+
+Una forma de representar estas dos métricas como una sola es mediante el valor F, definido como:
+
+\begin{equation}
+	F = 2\frac{P\cdot R}{P+R}
+\end{equation}
+
+al ponderar de manera equitativa la precisión y exhaustividad, un alto valor indica que ambas son altas por igual \citep{bishop}.
+
+\subsection{ÍNDICE JACCARD}
+El índice Jaccard, conocido también como intersección sobre unión, es un estadístico usado para medir la similaridad entre conjuntos finitos mediante una "superposición" de valores comunes.
+
+Se define mediante la fórmula:
+
+\begin{equation}
+	IoU = \frac{|y\cap\hat{y}|}{|y\cup\hat{y}|}
+\end{equation}
+
+En tareas de segmentación semántica, este índice calcula la proporción de píxeles en común entre la máscara real y la estimada, y todos los píxeles que componen la combinación de ambas máscaras \citep{Goodfellow-et-al-2016}.

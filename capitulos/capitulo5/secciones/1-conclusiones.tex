@@ -1,0 +1,40 @@
+\section{CONCLUSIONES}
+Finalmente se concluye para cada objetivo específico
+\begin{itemize}
+	\item \textit{Diseñar un componente de aumentación y preprocesamiento de datos para extraer y crear un dataset con el fin de resolver la tarea.}
+	
+	Se diseñó un componente para, extraer imágenes y sus etiquetas de simulaciones, aumentar atributos con el fin de eliminar la ambigüedad en las intersecciones mediante una clasificación manual, y organizar las imágenes de cada simulación en su respectiva carpeta, indexado y etiquetado en un archivo csv.
+	
+	\item \textit{Reducir la complejidad de implementación del modelo mediante el uso de solamente una cámara.}
+	
+	Se redujo la complejidad de la implementación aplicando redes neuronales y algoritmos de visión artificial para inferir información extra a partir de una imagen RGB obtenida de una sola cámara, logrando así prescindir de sensores extra para la percepción del ambiente.
+	
+	\item \textit{Modificar y entrenar redes neuronales con una alta exactitud en las predicciones utilizando menos requisitos de cómputo.}
+	
+%	Se adaptó la red MobileNet para recibir como entrada extra la decisión en intersecciones, se cambió la función de costo de la red FastDepth para adaptarla a la tarea de clasificación bidimensional requerida en segmentación semántica, se entrenaron ambas redes en el conjunto de datos preparados para la tarea, además que se modificó la entrada de datos de la red FastDepth para que las predicciones tengan un límite de 30 metros, simplificando así la tarea con el fin de obtener mejores resultados, ya que todas las redes están pensadas para reducir requisitos computacionales sacrificando la complejidad de la distribución de datos que pueden ajustar, finalmente se analizó la exactitud mediante métricas de error descritas en la sección \ref{metricas-error}, obteniendo un buen resultado de predicción.
+	
+	Se modificaron y entrenaron las redes MobileNet y FastDepth para inferir la aceleración, dirección, profundidad y segmentación semántica, con menores requisitos computacionales al estar diseñadas para ejecutarse en dispositivos embedidos, obteniendo buenos resultados de predicción analizados en la sección \ref{metricas-error}.
+	
+	\item \textit{Analizar las predicciones de los modelos entrenados para comprobar si las representaciones aprendidas son invariantes a los cambios de perspectiva, iluminación y objetos en la imagen.}
+	
+%	Se exportaron las predicciones por fotograma de simulaciones aleatorias, así se analizó lo que predice cada red, el módulo de clasificación de semáforos, para comprobar que son invariantes a los cambios de iluminación en diferentes condiciones climáticas, a los objetos y las perspectivas en las que aparecen, segmentándolos y ubicándolos correctamente con un alto porcentaje de exactitud como se detalla en la sección \ref{representaciones-aprendidas}, y visualizando en la sección \ref{pruebas-simulador} las áreas de interés de la red neuronal al predecir la dirección, siendo lo más llamativo que busca la acera en el lado derecho para mantenerse en el carril.
+	
+	Se analizaron las predicciones fotograma por fotograma de simulaciones con diferentes condiciones climáticas, vehículos en distintas perspectivas y objetos de interés en distintas posiciones, se constató en las secciones \ref{representaciones-aprendidas} y \ref{pruebas-simulador} que los modelos y algoritmos con los parámetros elegidos son invariantes a estos cambios, además que se comprendió que la red de conducción basa su inferencia en la posición de la acera derecha en la imagen.
+	
+	\item \textit{Combinar las salidas de algoritmos de visión computacional y modelos de aprendizaje profundo para mejorar la generalización de predicciones.}
+	
+%	Se implementó un flujo de pasos que realiza un post procesamiento a las predicciones de las máscaras de segmentación de los objetos a detectar mediante dilatación, erosión y apertura para reducir las falsas predicciones, adicionalmente, se implementó un algoritmo de grafos para coloreado de imágenes, modificándolo para obtener el mínimo rectángulo que encierra un objeto en la máscara predicha por la SemsegNet, y finalmente se aplicó K-Means con umbrales de valores de píxeles para la clasificación de semáforos en las detecciones de señales de tránsito, además del color de estos, y así decidir si frenar o no de manera independiente a las predicciones de la red de conducción.
+	
+	Se combinaron las salidas de las redes neuronales de profundidad y segmentación semántica con las operaciones de dilatación, erosión y apertura, reduciendo así estimaciones residuales, además de la clasificación de semáforos por cuantización de colores para complementar las predicciones de aceleración por la red de conducción, logrando así generalizar las inferencias del acelerador y dirección dada la imagen de entrada.
+	
+	\item \textit{Probar el rendimiento del modelo en una simulación, analizando casos de fallas y qué situaciones puede manejar correctamente.}
+	
+%	Se realizaron simulaciones dónde el vehículo se condujo solo hasta que cometiera un error o excediera un tiempo límite sin errores, así se probó que en general el vehículo puede conducirse solo, cometiendo errores en situaciones puntuales, en base a estos resultados se concluye basándose en la tabla \ref{niveles}, que se obtiene una autonomía entre nivel 2 y nivel 3, ya que realiza el control longitudinal y lateral, al igual que frena al detectar obstáculos cerca, pero requiere la intervención de una persona que esté alerta en caso de fallas en la prevención de colisión y durante salidas del camino.
+
+	Se comprobó mediante simulaciones que en general el vehículo puede controlar la dirección de manera efectiva y frenar ante obstáculos, cometiendo errores en situaciones puntuales, como ser el fallo de clasificación de charcos de agua como vehículos causando su detención y la no detección de postes, ocasionando colisiones.
+	
+\end{itemize}
+
+Así se cumple el objetivo de lograr la autonomía básica en vías de doble sentido con separación física, ya que realiza el control longitudinal y lateral, al igual que frena al detectar obstáculos cerca, pero requiere la intervención de una persona que esté alerta en caso de fallas en la prevención de colisión y durante salidas del camino.
+
+En base a las pruebas realizadas en el simulador y las métricas obtenidas, no se puede rechazar la hipótesis, por lo tanto se acepta el modelo de conducción autónoma mediante el uso de aprendizaje profundo y algoritmos de visión computacional alcanza una autonomía de nivel 2 en vías de doble sentido con separación física.

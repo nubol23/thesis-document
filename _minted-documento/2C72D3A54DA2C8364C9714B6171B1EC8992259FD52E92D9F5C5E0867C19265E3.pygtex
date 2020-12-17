@@ -1,0 +1,28 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k+kn}{as} \PYG{n+nn}{pd}
+\PYG{k+kn}{import} \PYG{n+nn}{os}
+\PYG{k+kn}{from} \PYG{n+nn}{pathlib} \PYG{k+kn}{import} \PYG{n}{Path}
+
+\PYG{c+c1}{\PYGZsh{} Listar los CSVs en orden de creación}
+\PYG{k}{def} \PYG{n+nf}{listdir\PYGZus{}date}\PYG{p}{(}\PYG{n}{dirpath}\PYG{p}{):}
+    \PYG{k}{return} \PYG{n+nb}{map}\PYG{p}{(}\PYG{k}{lambda} \PYG{n}{p}\PYG{p}{:} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{p}\PYG{p}{)}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}/\PYGZsq{}}\PYG{p}{)[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{],} 
+               \PYG{n+nb}{sorted}\PYG{p}{(}\PYG{n}{Path}\PYG{p}{(}\PYG{n}{dirpath}\PYG{p}{)}\PYG{o}{.}\PYG{n}{iterdir}\PYG{p}{(),} \PYG{n}{key}\PYG{o}{=}\PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{getmtime}\PYG{p}{))}
+
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZsq{}}\PYG{p}{:}
+    \PYG{n}{path} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}path/to/dfs\PYGZsq{}}
+
+    \PYG{c+c1}{\PYGZsh{} Cargar los CSVs ordenados por fecha como una tupla(nombre, objeto)}
+    \PYG{n}{dfs} \PYG{o}{=} \PYG{p}{[(}\PYG{n+nb}{file}\PYG{p}{,} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}csv}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}path\PYGZcb{}/\PYGZob{}file\PYGZcb{}\PYGZsq{}}\PYG{p}{))} \PYG{k}{for} \PYG{n+nb}{file} \PYG{o+ow}{in} \PYG{n}{listdir\PYGZus{}date}\PYG{p}{(}\PYG{n}{path}\PYG{p}{)]}
+
+    \PYG{k}{for} \PYG{n}{filename}\PYG{p}{,} \PYG{n}{df} \PYG{o+ow}{in} \PYG{n}{dfs}\PYG{p}{:}
+        \PYG{c+c1}{\PYGZsh{} Insertar colúmna de los nombres de archivos y número de simulación}
+        \PYG{c+c1}{\PYGZsh{} correspondiente a cada csv}
+        \PYG{n}{names} \PYG{o}{=} \PYG{p}{[}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}filename.split(\PYGZdq{}.\PYGZdq{})[0]\PYGZcb{}/\PYGZob{}i\PYGZcb{}.png\PYGZsq{}} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{df}\PYG{p}{))]}
+        \PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}filenames\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{names}
+
+    \PYG{c+c1}{\PYGZsh{} Concatenar CSVs en uno solo}
+    \PYG{n}{whole\PYGZus{}dataset} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{concat}\PYG{p}{(}\PYG{n+nb}{list}\PYG{p}{(}\PYG{n+nb}{map}\PYG{p}{(}\PYG{k}{lambda} \PYG{n}{x}\PYG{p}{:} \PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{dfs}\PYG{p}{)))}
+
+    \PYG{c+c1}{\PYGZsh{} Guardar como un nuevo archivo}
+    \PYG{n}{whole\PYGZus{}dataset}\PYG{o}{.}\PYG{n}{to\PYGZus{}csv}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}path/to/train\PYGZus{}dataset.csv\PYGZsq{}}\PYG{p}{,} \PYG{n}{index}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{)}
+\end{Verbatim}

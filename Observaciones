@@ -1,0 +1,24 @@
+- Tipos de vias en el objetivo general
+    - Revisar la categorización
+    - Vías de doble sentido *
+    - En las pruebas especificamos qué tipos de vías son
+- Corregir cámaras por "una cámara"
+
+LIMITES <-
+- Especificar calles asfaltadas
+- Los tipos de clima de las
+- No se consideran ciertos clímas por los límites de la capacidad del modelo
+- Diferentes condiciones atmosfericas
+- Eliminar redundancia "modelos"
+
+ALCANCES:
+- Cambiar por dentro de carriles
+- Detector de semáforos.
+- Cambiar por el tipo de vías
+
+RECOMENDACIONES:
+- Percepción para no videntes.
+
+RESULTADOS:
+- Especificar Nivel 2.5 de autonomía
+- Mostrar los casos donde se choca

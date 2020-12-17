@@ -1,0 +1,10 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{base\PYGZus{}net} \PYG{o}{=} \PYG{n}{mobilenet\PYGZus{}v2}\PYG{p}{(}\PYG{n}{pretrained}\PYG{o}{=}\PYG{n}{pretrained}\PYG{p}{)}
+
+\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{features} \PYG{o}{=} \PYG{n}{base\PYGZus{}net}\PYG{o}{.}\PYG{n}{features}
+\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{classifier} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Sequential}\PYG{p}{(}
+    \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Dropout}\PYG{p}{(}\PYG{l+m+mf}{0.2}\PYG{p}{),}
+    \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{l+m+mi}{1280}\PYG{p}{,} \PYG{l+m+mi}{251}\PYG{p}{),}
+\PYG{p}{)}
+\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{concat\PYGZus{}fc} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{Linear}\PYG{p}{(}\PYG{l+m+mi}{256}\PYG{p}{,} \PYG{n}{num\PYGZus{}classes}\PYG{p}{)}
+\end{Verbatim}

@@ -1,0 +1,55 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k+kn}{as} \PYG{n+nn}{pd}
+\PYG{k+kn}{import} \PYG{n+nn}{os}
+
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZsq{}}\PYG{p}{:}
+  \PYG{c+c1}{\PYGZsh{} CSV del conjunto de datos}
+  \PYG{n}{dataset} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}csv}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}path/to/train\PYGZus{}dataset.csv\PYGZsq{}}\PYG{p}{)}
+  \PYG{c+c1}{\PYGZsh{} CSV de intersecciones etiquetadas}
+  \PYG{n}{junctions} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}csv}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}path/to/juncs.csv\PYGZsq{}}\PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} Separar la colúmna filenames en una para carpetas y otra para nombre de archivos}
+  \PYG{n}{dataset}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}folder\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{p}{[}\PYG{n}{f}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}/\PYGZsq{}}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{k}{for} \PYG{n}{f} \PYG{o+ow}{in} \PYG{n}{dataset}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}filenames\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{tolist}\PYG{p}{()]}
+  \PYG{n}{dataset}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}file\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{p}{[}\PYG{n}{f}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}/\PYGZsq{}}\PYG{p}{)[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}.\PYGZsq{}}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{k}{for} \PYG{n}{f} \PYG{o+ow}{in} \PYG{n}{dataset}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}filenames\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{tolist}\PYG{p}{()]}
+  \PYG{n}{dataset} \PYG{o}{=} \PYG{n}{dataset}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{([}\PYG{l+s+s1}{\PYGZsq{}filenames\PYGZsq{}}\PYG{p}{],} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} Crear una lista vacía para cada etiqueta llena de ceros}
+  \PYG{c+c1}{\PYGZsh{} (valores negativos en clasificación binaria)}
+  \PYG{n}{path\PYGZus{}left} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{dataset}\PYG{p}{)}
+  \PYG{n}{path\PYGZus{}right} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{dataset}\PYG{p}{)}
+  \PYG{n}{path\PYGZus{}forward} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{dataset}\PYG{p}{)}
+
+  \PYG{n}{action\PYGZus{}left} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{dataset}\PYG{p}{)}
+  \PYG{n}{action\PYGZus{}right} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{dataset}\PYG{p}{)}
+  \PYG{n}{action\PYGZus{}forward} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{dataset}\PYG{p}{)}
+  \PYG{c+c1}{\PYGZsh{} Por defecto la \PYGZdq{}No acción\PYGZdq{} está marcada.}
+  \PYG{n}{no\PYGZus{}action} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{*}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{dataset}\PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} Ubicación de las imágenes de intersecciones}
+  \PYG{n}{junc\PYGZus{}path} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}path/to/junctions\PYGZsq{}}
+
+  \PYG{c+c1}{\PYGZsh{} Ordenar carpetas de intersección por el número de menor a mayor}
+  \PYG{n}{juncs} \PYG{o}{=} \PYG{n+nb}{sorted}\PYG{p}{(}\PYG{n}{os}\PYG{o}{.}\PYG{n}{listdir}\PYG{p}{(}\PYG{n}{junc\PYGZus{}path}\PYG{p}{),} \PYG{n}{key}\PYG{o}{=}\PYG{k}{lambda} \PYG{n}{x}\PYG{p}{:} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{x}\PYG{p}{))}
+
+  \PYG{k}{for} \PYG{n}{junc} \PYG{o+ow}{in} \PYG{n}{juncs}\PYG{p}{:}
+    \PYG{c+c1}{\PYGZsh{} Ordenar los archivos numéricamente}
+    \PYG{n}{files} \PYG{o}{=} \PYG{n+nb}{sorted}\PYG{p}{(}\PYG{n}{os}\PYG{o}{.}\PYG{n}{listdir}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}junc\PYGZus{}path\PYGZcb{}/\PYGZob{}junc\PYGZcb{}\PYGZsq{}}\PYG{p}{),}
+                   \PYG{n}{key}\PYG{o}{=}\PYG{k}{lambda} \PYG{n}{x}\PYG{p}{:} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{x}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}.\PYGZsq{}}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}\PYGZus{}\PYGZsq{}}\PYG{p}{)[}\PYG{l+m+mi}{1}\PYG{p}{]))}
+
+    \PYG{c+c1}{\PYGZsh{} Indexar la fila correspondiente a la intersección}
+    \PYG{n}{row} \PYG{o}{=} \PYG{n}{junctions}\PYG{o}{.}\PYG{n}{iloc}\PYG{p}{[}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{junc}\PYG{p}{)]}
+    \PYG{k}{for} \PYG{n+nb}{file} \PYG{o+ow}{in} \PYG{n}{files}\PYG{p}{:}
+      \PYG{n}{folder}\PYG{p}{,} \PYG{n}{img} \PYG{o}{=} \PYG{n+nb}{list}\PYG{p}{(}\PYG{n+nb}{map}\PYG{p}{(}\PYG{n+nb}{int}\PYG{p}{,} \PYG{n+nb}{file}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}.\PYGZsq{}}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}\PYGZus{}\PYGZsq{}}\PYG{p}{)))}
+      \PYG{n}{idx} \PYG{o}{=} \PYG{l+m+mi}{8000}\PYG{o}{*}\PYG{n}{folder} \PYG{o}{+} \PYG{n}{img}
+
+      \PYG{c+c1}{\PYGZsh{} Asignar los valores etiquetados}
+      \PYG{n}{path\PYGZus{}left}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}path\PYGZus{}left\PYGZsq{}}\PYG{p}{]}
+      \PYG{n}{path\PYGZus{}right}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}path\PYGZus{}right\PYGZsq{}}\PYG{p}{]}
+      \PYG{n}{path\PYGZus{}forward}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}path\PYGZus{}forward\PYGZsq{}}\PYG{p}{]}
+
+      \PYG{n}{action\PYGZus{}left}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}action\PYGZus{}left\PYGZsq{}}\PYG{p}{]}
+      \PYG{n}{action\PYGZus{}right}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}action\PYGZus{}right\PYGZsq{}}\PYG{p}{]}
+      \PYG{n}{action\PYGZus{}forward}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}action\PYGZus{}forward\PYGZsq{}}\PYG{p}{]}
+      \PYG{c+c1}{\PYGZsh{} Como es una intersección se desmarca la \PYGZdq{}No acción\PYGZdq{}}
+      \PYG{n}{no\PYGZus{}action}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+\end{Verbatim}

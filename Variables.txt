@@ -1,0 +1,43 @@
+Cambiar por investigación: de tipo experimental porque se representa adapta el modelo de conducción autónoma a las vías de doble sentido (realidad que se está simulando).
+
+* Aceleración: +-0.067
+* Giro: +-0.069
+* Error estimación distancia: +-1.1931
+* Valor-F (Exactitud píxel a píxel de las máscaras de clases)
+* Índice Jaccard (Exactitud espacial de las máscaras de clases)
+* Exactitud de clasificación de semáforos: 99.08%
+* En 3/17 simulaciones se comete error (82% funcional)
+0 - Default
+1 - ClearNoon
+2 - CloudyNoon
+3 - WetNoon
+4 - WetCloudyNoon
+9 - CloudySunset
+10 - WetSunset
+11 - WetCloudySunset
+12 - MidRainSunset
+13 - HardRainSunset
+14 - SoftRainSunset
+
+¿De qué manera conseguir un nivel básico de conducción autónoma en vías de doble sentido?
+
+Plantear un modelo para la conducción autónoma que logre una autonomía básica en vías de doble sentido con separación física.
+
+El modelo de conducción autónoma mediante el uso de aprendizaje profundo y algoritmos de visión computacional alcanza una autonomía de nivel 2 en vías de doble sentido con separación física.
+
+Variables:
+Independiente: Aprendizaje profundo y algoritmos de visión computacional
+Dependiente: Modelo de conducción autónoma
+
+Métricas principales:
+- Con un porcentaje de exactitud de clasificación para la detección de obstáculos y semáforos de 89%, el error del control longitudinal es de +-0.067 -> 6.7 % error de aceleración y frenado -> Exactitud es 93.3%
+- Error del control direccional del +-0.069 -> 6.9 % de error para la izquierda y derecha -> Exactitud es 93.1%
+- 82% de las pruebas no se comenten fallos de 17 simulaciones.
+- Con un 93.2% se puede afirmar que se obtiene una conducción de nivel 2 en el 82% de las situaciones (las 17 pruebas).
+
+
+
+
+
+
+- Con un 89.4% de confianza se alcanza la conducción autónoma de nivel 2 ....

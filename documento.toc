@@ -1,0 +1,264 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\babel@toc {spanish}{}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {1}MARCO REFERENCIAL}{1}{chapter.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.1}INTRODUCCI\IeC {\'O}N}{1}{section.1.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.2}ANTECEDENTES}{2}{section.1.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.2.1}ESTADO DEL ARTE}{2}{subsection.1.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {1.2.1.1}DETECCI\IeC {\'O}N DE OBJETOS}{2}{subsubsection.1.2.1.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{1963 PERCEPCI\IeC {\'O}N DE S\IeC {\'O}LIDOS TRIDIMENSIONALES}{2}{subsubsection.1.2.1.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{2001 HAAR FEATURES}{2}{figure.caption.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{2005 HISTOGRAMAS DE GRADIENTES ORIENTADOS}{3}{figure.caption.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{2016 YOLO}{3}{figure.caption.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{2016 SSD}{4}{figure.caption.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{2020 RETINANET}{4}{figure.caption.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {1.2.1.2}SEGMENTACI\IeC {\'O}N SEM\IeC {\'A}NTICA}{5}{subsubsection.1.2.1.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{SEGMENTACI\IeC {\'O}N POR COLOR Y ESCALA DE GRISES}{5}{subsubsection.1.2.1.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{2004 CAMPOS ALEATORIOS CONDICIONALES MULTIESCALA}{5}{subsubsection.1.2.1.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{2015 U-NET}{5}{figure.caption.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{2017 MASK-RCNN}{6}{figure.caption.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {1.2.1.3}SISTEMAS DE CONDUCCI\IeC {\'O}N AUT\IeC {\'O}NOMA}{6}{subsubsection.1.2.1.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{2004 DAVE}{6}{subsubsection.1.2.1.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{2004 DARPA GRAND CHALLENGE}{7}{figure.caption.9}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{2010 GOOGLE}{7}{figure.caption.9}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{2015 TESLA}{7}{figure.caption.9}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.2.2}TRABAJOS SIMILARES}{7}{subsection.1.2.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.3}PLANTEAMIENTO DEL PROBLEMA}{8}{section.1.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.3.1}PROBLEMA CENTRAL}{9}{subsection.1.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.3.2}PROBLEMAS SECUNDARIOS}{10}{subsection.1.3.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.4}DEFINICI\IeC {\'O}N DE OBJETIVOS}{10}{section.1.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.4.1}OBJETIVO GENERAL}{10}{subsection.1.4.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.4.2}OBJETIVOS ESPEC\IeC {\'I}FICOS}{10}{subsection.1.4.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.5}HIP\IeC {\'O}TESIS}{11}{section.1.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.5.1}OPERACIONALIZACI\IeC {\'O}N DE VARIABLES}{11}{subsection.1.5.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.6}JUSTIFICACI\IeC {\'O}N}{11}{section.1.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.6.1}JUSTIFICACI\IeC {\'O}N ECON\IeC {\'O}MICA}{11}{subsection.1.6.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.6.2}JUSTIFICACI\IeC {\'O}N SOCIAL}{12}{subsection.1.6.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.6.3}JUSTIFICACI\IeC {\'O}N CIENT\IeC {\'I}FICA}{12}{subsection.1.6.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.7}ALCANCES Y L\IeC {\'I}MITES}{12}{section.1.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.7.1}ALCANCES}{12}{subsection.1.7.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.7.2}L\IeC {\'I}MITES}{12}{subsection.1.7.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.8}APORTES}{13}{section.1.8}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.8.1}PR\IeC {\'A}CTICO}{13}{subsection.1.8.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.8.2}TE\IeC {\'O}RICO}{13}{subsection.1.8.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.9}METODOLOG\IeC {\'I}A}{13}{section.1.9}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {2}MARCO TE\IeC {\'O}RICO}{14}{chapter.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.1}SISTEMAS DE CONDUCCI\IeC {\'O}N AUT\IeC {\'O}NOMA}{14}{section.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1.1}TAREAS DE LA CONDUCCI\IeC {\'O}N AUT\IeC {\'O}NOMA}{14}{subsection.2.1.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1.2}ARQUITECTURA DE LA CONDUCCI\IeC {\'O}N AUT\IeC {\'O}NOMA}{15}{subsection.2.1.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1.3}CARLA}{15}{subsection.2.1.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1.4}NIVELES DE CONDUCCI\IeC {\'O}N AUT\IeC {\'O}NOMA}{16}{subsection.2.1.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.2}VISI\IeC {\'O}N COMPUTACIONAL}{16}{section.2.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.1}PROCESAMIENTO DE IM\IeC {\'A}GENES}{16}{subsection.2.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.2.1.1}REPRESENTACI\IeC {\'O}N DE IM\IeC {\'A}GENES EN UNA COMPUTADORA}{17}{subsubsection.2.2.1.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.2.1.2}CONVOLUCI\IeC {\'O}N}{18}{subsubsection.2.2.1.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.2.1.3}DETECCI\IeC {\'O}N DE CONTORNOS}{19}{subsubsection.2.2.1.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.2}TRANSFORMACIONES MORFOL\IeC {\'O}GICAS}{19}{subsection.2.2.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.2.2.1}DILATACI\IeC {\'O}N}{19}{subsubsection.2.2.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.2.2.2}EROSI\IeC {\'O}N}{19}{subsubsection.2.2.2.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.2.2.3}APERTURA}{20}{subsubsection.2.2.2.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.3}K-MEANS}{21}{subsection.2.2.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.4}FLOOD FILL}{22}{subsection.2.2.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.3}APRENDIZAJE AUTOM\IeC {\'A}TICO}{23}{section.2.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.3.1}APRENDIZAJE SUPERVISADO}{23}{subsection.2.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.3.1.1}APRENDIZAJE CORRECTO PROBABLEMENTE APROXIMADO}{23}{subsubsection.2.3.1.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.3.2}REGRESI\IeC {\'O}N}{24}{subsection.2.3.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.3.2.1}REGRESI\IeC {\'O}N LINEAL}{25}{subsubsection.2.3.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.3.2.2}REGRESI\IeC {\'O}N GENERALIZADA}{26}{subsubsection.2.3.2.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.3.2.3}MEDIAS M\IeC {\'O}VILES EXPONENCIALES}{27}{subsubsection.2.3.2.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.3.3}CLASIFICACI\IeC {\'O}N}{27}{subsection.2.3.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.3.3.1}REGRESI\IeC {\'O}N SOFTMAX}{27}{subsubsection.2.3.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.3.4}DESCENSO DEL GRADIENTE ESTOC\IeC {\'A}STICO}{29}{subsection.2.3.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.3.5}ADAM}{30}{subsection.2.3.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.4}APRENDIZAJE PROFUNDO}{31}{section.2.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.4.1}PERCEPTR\IeC {\'O}N MULTICAPA}{31}{subsection.2.4.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.4.1.1}FUNCIONES DE ACTIVACI\IeC {\'O}N}{33}{subsubsection.2.4.1.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.4.1.2}RETROPROPAGACI\IeC {\'O}N DE LOS ERRORES}{33}{subsubsection.2.4.1.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.4.2}REDES NEURONALES CONVOLUCIONALES}{34}{subsection.2.4.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.4.2.1}STRIDES}{34}{subsubsection.2.4.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.4.2.2}POOLING}{35}{subsubsection.2.4.2.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.4.2.3}MOBILENET V2}{36}{subsubsection.2.4.2.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {2.4.2.4}FAST DEPTH}{37}{subsubsection.2.4.2.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.4.3}APRENDIZAJE DE REPRESENTACIONES PROFUNDAS}{38}{subsection.2.4.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.5}M\IeC {\'E}TRICAS DE ERROR}{40}{section.2.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.5.1}ERROR CUADR\IeC {\'A}TICO MEDIO}{40}{subsection.2.5.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.5.2}ERROR ABSOLUTO MEDIO}{40}{subsection.2.5.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.5.3}PRECISI\IeC {\'O}N Y EXHAUSTIVIDAD}{41}{subsection.2.5.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.5.4}\IeC {\'I}NDICE JACCARD}{42}{subsection.2.5.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.6}COMPILACI\IeC {\'O}N EN TIEMPO DE EJECUCI\IeC {\'O}N}{42}{section.2.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {3}MARCO APLICATIVO}{42}{chapter.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.1}COMPRENSI\IeC {\'O}N DEL PROYECTO}{42}{section.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.2}COMPRENSI\IeC {\'O}N DE LOS DATOS}{43}{section.3.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.2.1}ACELERADOR Y DIRECCI\IeC {\'O}N}{44}{subsection.3.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.2.2}PROFUNDIDAD}{44}{subsection.3.2.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.2.3}SEGMENTACI\IeC {\'O}N SEM\IeC {\'A}NTICA}{45}{subsection.3.2.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.3}PREPARACI\IeC {\'O}N DE DATOS}{46}{section.3.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3.1}UNI\IeC {\'O}N DE DATAFRAMES}{47}{subsection.3.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3.2}ETIQUETADO DE INTERSECCIONES}{47}{subsection.3.3.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3.3}CONCATENACI\IeC {\'O}N DE ATRIBUTOS}{49}{subsection.3.3.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.4}MODELADO}{49}{section.3.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.1}RED DE CONDUCCI\IeC {\'O}N}{50}{subsection.3.4.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.2}RED DE PROFUNDIDAD}{51}{subsection.3.4.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.3}RED DE SEGMENTACI\IeC {\'O}N SEM\IeC {\'A}NTICA}{52}{subsection.3.4.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.4}SUAVIZADO DE DIRECCI\IeC {\'O}N}{52}{subsection.3.4.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.5}CAJA DELIMITADORA}{53}{subsection.3.4.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.6}CUANTIFICACI\IeC {\'O}N DIGITAL DEL COLOR}{54}{subsection.3.4.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.7}MODELO PARA LA CONDUCCI\IeC {\'O}N AUT\IeC {\'O}NOMA}{55}{subsection.3.4.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.5}EVALUACI\IeC {\'O}N}{56}{section.3.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.5.1}DRIVENET}{56}{subsection.3.5.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.5.2}DEPTHNET}{57}{subsection.3.5.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.5.3}SEMSEGNET}{58}{subsection.3.5.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.5.4}CENTROIDES K-MEANS}{58}{subsection.3.5.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.6}DESPLIEGUE}{59}{section.3.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {4}RESULTADOS Y AN\IeC {\'A}LISIS}{60}{chapter.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.1}RENDIMIENTO DE LOS M\IeC {\'O}DULOS}{60}{section.4.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.1}ACELERACI\IeC {\'O}N Y GIRO}{60}{subsection.4.1.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.2}ESTIMACI\IeC {\'O}N DE PROFUNDIDAD}{61}{subsection.4.1.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.3}SEGMENTACI\IeC {\'O}N SEM\IeC {\'A}NTICA}{62}{subsection.4.1.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {4.1.3.1}MATRIZ DE CONFUSI\IeC {\'O}N}{63}{subsubsection.4.1.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {4.1.3.2}PRECISI\IeC {\'O}N Y EXHAUSTIVIDAD}{64}{subsubsection.4.1.3.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {4.1.3.3}CAJAS DELIMITADORAS}{66}{subsubsection.4.1.3.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {4.1.3.4}\IeC {\'I}NDICE JACCARD}{67}{subsubsection.4.1.3.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.4}DETECCI\IeC {\'O}N Y CLASIFICACI\IeC {\'O}N DE SEM\IeC {\'A}FOROS}{67}{subsection.4.1.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.2}REPRESENTACIONES APRENDIDAS}{69}{section.4.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.2.1}DISTANCIAS EN LA REGI\IeC {\'O}N DE INTER\IeC {\'E}S}{69}{subsection.4.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.2.2}VISUALIZACI\IeC {\'O}N DE ZONAS DE INTER\IeC {\'E}S}{70}{subsection.4.2.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.3}PRUEBAS EN SIMULADOR}{70}{section.4.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.3.1}CONDUCCI\IeC {\'O}N}{70}{subsection.4.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.3.2}FALLOS}{72}{subsection.4.3.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.4}PRUEBA DE LA HIP\IeC {\'O}TESIS}{73}{section.4.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {5}CONCLUSIONES Y RECOMENDACIONES}{74}{chapter.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.1}CONCLUSIONES}{74}{section.5.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.2}RECOMENDACIONES}{76}{section.5.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {6}BIBLIOGRAF\IeC {\'I}A}{77}{chapter.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{ANEXOS}{81}{section*.57}

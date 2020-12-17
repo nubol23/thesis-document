@@ -1,0 +1,4 @@
+\section{COMPILACIÓN EN TIEMPO DE EJECUCIÓN}
+	Debido a que Python es un lenguaje lento por ser interpretado, en ocasiones donde se requiera código que se ejecture rápidamente sin cambiar de lenguaje, se recurre a la compilación justo a tiempo o Just in Time Compilation, la cual permite compilar una función con los argumentos recibidos la primera vez que se utiliza.
+	
+	Numba es una librería de código abierto que dota de esta funcionalidad a Python, compilando a código máquina a través de LLVM funciones que cumplan las restricciones para poder inferir correctamente el tipo de dato, está pensado para que de manera directa sólo sea necesario agregar el decorador @njit antes de alguna función para que sea compilada la primera vez que se use \citep{numba}.

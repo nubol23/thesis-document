@@ -1,0 +1,31 @@
+%\negspacechap
+\chapter{RESULTADOS Y ANÁLISIS}
+	\negspacesec
+	\input{capitulos/capitulo4/secciones/1-analisis-de-curvas-de-aprendizaje}
+	
+	\pospacesec
+	\input{capitulos/capitulo4/secciones/2-analisis-de-representaciones-aprendidas}
+	
+	\input{capitulos/capitulo4/secciones/3-pruebas-en-el-simulador}
+	
+	\section{PRUEBA DE LA HIPÓTESIS}
+	
+	Para la prueba de la hipótesis ``\textit{El modelo de conducción autónoma mediante el uso de aprendizaje profundo y algoritmos de visión computacional alcanza una autonomía de nivel 2 en vías de doble sentido con separación física.}'' se siguió los siguientes pasos.
+	
+	\begin{enumerate}[nosep]
+		\item Se evaluaron los porcentajes de exactitud de predicción de las máscaras de segmentación y estimación de distancias a partir de las salidas de la DepthNet y SemsegNet (modelos de aprendizaje profundo).
+		\item Se calculó el error de detección y clasificación del color de semáforos, aplicando Flood Fill para la detección de la caja delimitadora y K-Means para la clasificación del color (algoritmos de visión computacional).
+		\item Se evaluó el error de la predicción de aceleración y frenado, en base a las predicciones conjuntas de las tres redes neuronales (DepthNet, SemsegNet y DriveNet) combinadas con la clasificación de los semáforos.
+		\item Se obtuvo el error de estimación de dirección tanto a la izquierda como derecha en base a la predicción de la DriveNet.
+	\end{enumerate}
+	
+	En base a los cálculos obtenidos se puede afirmar que:
+	
+	\begin{itemize}[nosep]
+		\item Con un porcentaje de exactitud de clasificación para la detección de obstáculos y semáforos de un 89\%, el error del control longitudinal es de $\pm 0.067$, considerando valores negativos como frenado y positivos como aceleración se obtiene un $6.7\%$ de error en el control longitudinal.
+		\item El error de la dirección es de $\pm0.069$ lo que da lugar a un $6.9\%$ de error en el control lateral.
+		\item De las 17 pruebas realizadas un $82\%$ son satisfactorias (3 pruebas con fallos).
+	\end{itemize}
+
+	Por lo tanto con un $93.2\%$ de confianza se puede afirmar que se obtiene una conducción autónoma de nivel 2 en el $82\%$ de las situaciones (17 pruebas).
+		

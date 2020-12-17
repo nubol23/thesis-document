@@ -1,0 +1,13 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{path} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}...\PYGZsq{}}  \PYG{c+c1}{\PYGZsh{} Dirección de los CSVs por simulación}
+\PYG{c+c1}{\PYGZsh{} Cargar una lista de CSVs}
+\PYG{n}{dfs} \PYG{o}{=} \PYG{p}{[(}\PYG{n+nb}{file}\PYG{p}{,} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}csv}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}path\PYGZcb{}/\PYGZob{}file\PYGZcb{}\PYGZsq{}}\PYG{p}{))} \PYG{k}{for} \PYG{n+nb}{file} \PYG{o+ow}{in} \PYG{n}{listdir\PYGZus{}date}\PYG{p}{(}\PYG{n}{path}\PYG{p}{)]}
+
+\PYG{k}{for} \PYG{n}{filename}\PYG{p}{,} \PYG{n}{df} \PYG{o+ow}{in} \PYG{n}{dfs}\PYG{p}{:}
+    \PYG{n}{names} \PYG{o}{=} \PYG{p}{[}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}filename.split(\PYGZdq{}.\PYGZdq{})[0]\PYGZcb{}/\PYGZob{}i\PYGZcb{}.png\PYGZsq{}} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{df}\PYG{p}{))]}
+    \PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}filenames\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{names}
+
+\PYG{n}{whole\PYGZus{}dataset} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{concat}\PYG{p}{(}\PYG{n+nb}{list}\PYG{p}{(}\PYG{n+nb}{map}\PYG{p}{(}\PYG{k}{lambda} \PYG{n}{x}\PYG{p}{:} \PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{dfs}\PYG{p}{)))}
+
+\PYG{n}{whole\PYGZus{}dataset}\PYG{o}{.}\PYG{n}{to\PYGZus{}csv}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}dest\PYGZcb{}/train\PYGZus{}dataset.csv\PYGZsq{}}\PYG{p}{,} \PYG{n}{index}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{)}
+\end{Verbatim}

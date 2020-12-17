@@ -1,0 +1,15 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n+nd}{@njit}
+\PYG{k}{def} \PYG{n+nf}{ff}\PYG{p}{(}\PYG{n}{mat}\PYG{p}{,} \PYG{n}{i}\PYG{p}{,} \PYG{n}{j}\PYG{p}{,} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{):}
+  \PYG{k}{if} \PYG{p}{(}\PYG{l+m+mi}{0} \PYG{o}{\PYGZlt{}=} \PYG{n}{i} \PYG{o}{\PYGZlt{}} \PYG{n}{mat}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])} \PYG{o+ow}{and} \PYG{p}{(}\PYG{l+m+mi}{0} \PYG{o}{\PYGZlt{}=} \PYG{n}{j} \PYG{o}{\PYGZlt{}} \PYG{n}{mat}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{])} \PYG{o+ow}{and} \PYG{n}{mat}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,} \PYG{n}{j}\PYG{p}{]} \PYG{o}{!=} \PYG{l+m+mi}{0}\PYG{p}{:}
+    \PYG{n}{mat}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,} \PYG{n}{j}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{n}{x1} \PYG{o}{=} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{x1}\PYG{p}{,} \PYG{n}{j}\PYG{p}{)}
+    \PYG{n}{y1} \PYG{o}{=} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{y1}\PYG{p}{,} \PYG{n}{i}\PYG{p}{)}
+    \PYG{n}{x2} \PYG{o}{=} \PYG{n+nb}{max}\PYG{p}{(}\PYG{n}{x2}\PYG{p}{,} \PYG{n}{j}\PYG{p}{)}
+    \PYG{n}{y2} \PYG{o}{=} \PYG{n+nb}{max}\PYG{p}{(}\PYG{n}{y2}\PYG{p}{,} \PYG{n}{i}\PYG{p}{)}
+
+    \PYG{k}{for} \PYG{n}{dx}\PYG{p}{,} \PYG{n}{dy} \PYG{o+ow}{in} \PYG{n}{directions}\PYG{p}{:}
+      \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2} \PYG{o}{=} \PYG{n}{ff}\PYG{p}{(}\PYG{n}{mat}\PYG{p}{,} \PYG{n}{i}\PYG{o}{+}\PYG{n}{dy}\PYG{p}{,} \PYG{n}{j}\PYG{o}{+}\PYG{n}{dx}\PYG{p}{,} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2}\PYG{p}{,} \PYG{n}{directions}\PYG{p}{)}
+
+  \PYG{k}{return} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{y1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{y2}
+\end{Verbatim}

@@ -1,0 +1,171 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{os}
+\PYG{k+kn}{import} \PYG{n+nn}{time}
+\PYG{k+kn}{import} \PYG{n+nn}{torch}
+\PYG{k+kn}{import} \PYG{n+nn}{torch.nn} \PYG{k+kn}{as} \PYG{n+nn}{nn}
+\PYG{k+kn}{import} \PYG{n+nn}{torch.optim}
+\PYG{k+kn}{import} \PYG{n+nn}{torch.utils.data}
+\PYG{k+kn}{import} \PYG{n+nn}{torchvision.transforms} \PYG{k+kn}{as} \PYG{n+nn}{transforms}
+\PYG{k+kn}{from} \PYG{n+nn}{custom\PYGZus{}mobilenet} \PYG{k+kn}{import} \PYG{n}{CustomMobileNet}
+
+\PYG{k+kn}{from} \PYG{n+nn}{PIL} \PYG{k+kn}{import} \PYG{n}{Image}
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k+kn}{as} \PYG{n+nn}{np}
+\PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k+kn}{as} \PYG{n+nn}{pd}
+\PYG{k+kn}{from} \PYG{n+nn}{tqdm} \PYG{k+kn}{import} \PYG{n}{tqdm}
+
+\PYG{k}{class} \PYG{n+nc}{DriveDataset}\PYG{p}{(}\PYG{n}{torch}\PYG{o}{.}\PYG{n}{utils}\PYG{o}{.}\PYG{n}{data}\PYG{o}{.}\PYG{n}{Dataset}\PYG{p}{):}
+  \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{root\PYGZus{}dir}\PYG{p}{,} \PYG{n}{transform}\PYG{o}{=}\PYG{n+nb+bp}{None}\PYG{p}{):}
+    \PYG{n}{temp} \PYG{o}{=} \PYG{n}{root\PYGZus{}dir}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}/\PYGZsq{}}\PYG{p}{)}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{root\PYGZus{}dir} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}/\PYGZsq{}}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{[:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{])}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{transform} \PYG{o}{=} \PYG{n}{transform}
+
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{data} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}csv}\PYG{p}{(}\PYG{n}{root\PYGZus{}dir}\PYG{p}{)}
+
+  \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}len\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+    \PYG{k}{return} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{data}\PYG{p}{)}
+
+  \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}getitem\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{idx}\PYG{p}{):}
+    \PYG{k}{if} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{is\PYGZus{}tensor}\PYG{p}{(}\PYG{n}{idx}\PYG{p}{):}
+        \PYG{n}{idx} \PYG{o}{=} \PYG{n}{idx}\PYG{o}{.}\PYG{n}{tolist}\PYG{p}{()}
+
+    \PYG{n}{row} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{data}\PYG{o}{.}\PYG{n}{iloc}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]}
+
+    \PYG{c+c1}{\PYGZsh{} Cargar imagen RGB}
+    \PYG{n}{folder}\PYG{p}{,} \PYG{n+nb}{file} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}filenames\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}/\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{img\PYGZus{}rgb\PYGZus{}path} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{root\PYGZus{}dir}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Images\PYGZsq{}}\PYG{p}{,} \PYG{n}{folder}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}rgb\PYGZsq{}}\PYG{p}{,} \PYG{n+nb}{file}\PYG{p}{)}
+    \PYG{n}{img\PYGZus{}rgb} \PYG{o}{=} \PYG{n}{Image}\PYG{o}{.}\PYG{n}{open}\PYG{p}{(}\PYG{n}{img\PYGZus{}rgb\PYGZus{}path}\PYG{p}{)}
+
+    \PYG{k}{if} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{:}
+        \PYG{n}{img\PYGZus{}rgb} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{img\PYGZus{}rgb}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} leer etiquetas de la i\PYGZhy{}ésima muestra}
+    \PYG{n}{throttle} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}throttle\PYGZsq{}}\PYG{p}{]}
+    \PYG{n}{steering} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}steer\PYGZsq{}}\PYG{p}{]}
+    \PYG{n}{action\PYGZus{}left} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}action\PYGZus{}left\PYGZsq{}}\PYG{p}{]}
+    \PYG{n}{action\PYGZus{}right} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}action\PYGZus{}right\PYGZsq{}}\PYG{p}{]}
+    \PYG{n}{action\PYGZus{}forward} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}action\PYGZus{}forward\PYGZsq{}}\PYG{p}{]}
+    \PYG{n}{no\PYGZus{}action} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}no\PYGZus{}action\PYGZsq{}}\PYG{p}{]}
+
+    \PYG{c+c1}{\PYGZsh{} Crear muestra}
+    \PYG{n}{sample} \PYG{o}{=} \PYG{p}{(}\PYG{n}{img\PYGZus{}rgb}\PYG{p}{,}
+              \PYG{c+c1}{\PYGZsh{} Tensor de parámetros de acción.}
+              \PYG{n}{torch}\PYG{o}{.}\PYG{n}{tensor}\PYG{p}{([}
+                  \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{action\PYGZus{}left}\PYG{p}{),} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{action\PYGZus{}right}\PYG{p}{),}
+                  \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{action\PYGZus{}forward}\PYG{p}{),} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{no\PYGZus{}action}\PYG{p}{)}
+              \PYG{p}{]),}
+              \PYG{c+c1}{\PYGZsh{} Tensor de etiquetas de aceleración y giro.}
+              \PYG{n}{torch}\PYG{o}{.}\PYG{n}{tensor}\PYG{p}{([}
+                  \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{throttle}\PYG{p}{),} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{steering}\PYG{p}{)}
+              \PYG{p}{]))}
+
+    \PYG{k}{return} \PYG{n}{sample}
+
+
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZsq{}}\PYG{p}{:}
+  \PYG{n}{model} \PYG{o}{=} \PYG{n}{CustomMobileNet}\PYG{p}{(}\PYG{n}{pretrained}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+
+  \PYG{n}{model}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{()}
+
+  \PYG{n}{train\PYGZus{}dir} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}path/to/train\PYGZus{}dataset\PYGZus{}final.csv\PYGZsq{}}
+  \PYG{n}{val\PYGZus{}dir} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}path/to/val\PYGZus{}dataset\PYGZus{}final.csv\PYGZsq{}}
+
+  \PYG{n}{train\PYGZus{}loader} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{utils}\PYG{o}{.}\PYG{n}{data}\PYG{o}{.}\PYG{n}{DataLoader}\PYG{p}{(}
+    \PYG{n}{dataset}\PYG{o}{=}\PYG{n}{DriveDataset}\PYG{p}{(}\PYG{n}{train\PYGZus{}dir}\PYG{p}{,} \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{Compose}\PYG{p}{([}
+        \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{Resize}\PYG{p}{((}\PYG{l+m+mi}{224}\PYG{p}{,} \PYG{l+m+mi}{224}\PYG{p}{),} \PYG{n}{interpolation}\PYG{o}{=}\PYG{n}{Image}\PYG{o}{.}\PYG{n}{BICUBIC}\PYG{p}{),}
+        \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{ToTensor}\PYG{p}{(),}
+        \PYG{k}{lambda} \PYG{n}{T}\PYG{p}{:} \PYG{n}{T}\PYG{p}{[:}\PYG{l+m+mi}{3}\PYG{p}{]}
+    \PYG{p}{])),}
+    \PYG{n}{batch\PYGZus{}size}\PYG{o}{=}\PYG{l+m+mi}{64}\PYG{p}{,}
+    \PYG{n}{shuffle}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{,}
+    \PYG{n}{num\PYGZus{}workers}\PYG{o}{=}\PYG{l+m+mi}{12}\PYG{p}{,}
+    \PYG{n}{pin\PYGZus{}memory}\PYG{o}{=}\PYG{n+nb+bp}{True}
+  \PYG{p}{)}
+
+  \PYG{n}{val\PYGZus{}loader} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{utils}\PYG{o}{.}\PYG{n}{data}\PYG{o}{.}\PYG{n}{DataLoader}\PYG{p}{(}
+    \PYG{n}{dataset}\PYG{o}{=}\PYG{n}{DriveDataset}\PYG{p}{(}\PYG{n}{val\PYGZus{}dir}\PYG{p}{,} \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{Compose}\PYG{p}{([}
+        \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{Resize}\PYG{p}{((}\PYG{l+m+mi}{224}\PYG{p}{,} \PYG{l+m+mi}{224}\PYG{p}{),} \PYG{n}{interpolation}\PYG{o}{=}\PYG{n}{Image}\PYG{o}{.}\PYG{n}{BICUBIC}\PYG{p}{),}
+        \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{ToTensor}\PYG{p}{()}
+    \PYG{p}{])),}
+    \PYG{n}{batch\PYGZus{}size}\PYG{o}{=}\PYG{l+m+mi}{64}\PYG{p}{,}
+    \PYG{n}{shuffle}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{,}
+    \PYG{n}{num\PYGZus{}workers}\PYG{o}{=}\PYG{l+m+mi}{12}\PYG{p}{,}
+    \PYG{n}{pin\PYGZus{}memory}\PYG{o}{=}\PYG{n+nb+bp}{True}
+  \PYG{p}{)}
+
+  \PYG{n}{criterion} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{MSELoss}\PYG{p}{()}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{()}
+  \PYG{n}{optimizer} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{optim}\PYG{o}{.}\PYG{n}{Adam}\PYG{p}{(}\PYG{n}{model}\PYG{o}{.}\PYG{n}{parameters}\PYG{p}{())}
+
+  \PYG{n}{losses} \PYG{o}{=} \PYG{p}{[]}
+
+  \PYG{c+c1}{\PYGZsh{} Iterar para entrenar la red}
+  \PYG{k}{for} \PYG{n}{epoch} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{50}\PYG{p}{):}
+    \PYG{n}{start} \PYG{o}{=} \PYG{n}{time}\PYG{o}{.}\PYG{n}{time}\PYG{p}{()}
+
+    \PYG{n}{model}\PYG{o}{.}\PYG{n}{train}\PYG{p}{()}
+    \PYG{n}{train\PYGZus{}loss} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{c+c1}{\PYGZsh{} Definir barra de progreso interactiva}
+    \PYG{n}{train\PYGZus{}progress} \PYG{o}{=} \PYG{n}{tqdm}\PYG{p}{(}\PYG{n+nb}{enumerate}\PYG{p}{(}\PYG{n}{train\PYGZus{}loader}\PYG{p}{),}
+                          \PYG{n}{desc}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}train\PYGZdq{}}\PYG{p}{,}
+                          \PYG{n}{total}\PYG{o}{=}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{train\PYGZus{}loader}\PYG{p}{))}
+
+    \PYG{c+c1}{\PYGZsh{} Iterar por cada minibatch de 64 muestras}
+    \PYG{k}{for} \PYG{n}{i}\PYG{p}{,} \PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{actions}\PYG{p}{,} \PYG{n}{y}\PYG{p}{)} \PYG{o+ow}{in} \PYG{n}{train\PYGZus{}progress}\PYG{p}{:}
+      \PYG{c+c1}{\PYGZsh{} Copiar los datos a la GPU}
+      \PYG{n}{X} \PYG{o}{=} \PYG{n}{X}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{(}\PYG{n}{non\PYGZus{}blocking}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+      \PYG{n}{actions} \PYG{o}{=} \PYG{n}{actions}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{(}\PYG{n}{non\PYGZus{}blocking}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+      \PYG{n}{y} \PYG{o}{=} \PYG{n}{y}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{(}\PYG{n}{non\PYGZus{}blocking}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+      \PYG{n}{y\PYGZus{}hat} \PYG{o}{=} \PYG{n}{model}\PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{actions}\PYG{p}{)}
+
+      \PYG{c+c1}{\PYGZsh{} Calcular el error cuadrático medio para la aceleración}
+      \PYG{n}{loss1} \PYG{o}{=} \PYG{n}{criterion}\PYG{p}{(}\PYG{n}{y\PYGZus{}hat}\PYG{p}{[:,} \PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{y}\PYG{p}{[:,} \PYG{l+m+mi}{0}\PYG{p}{])}
+      \PYG{c+c1}{\PYGZsh{} Calcular el error cuadrático medio para la dirección}
+      \PYG{n}{loss2} \PYG{o}{=} \PYG{n}{criterion}\PYG{p}{(}\PYG{n}{torch}\PYG{o}{.}\PYG{n}{tanh}\PYG{p}{(}\PYG{n}{y\PYGZus{}hat}\PYG{p}{[:,} \PYG{l+m+mi}{1}\PYG{p}{]),} \PYG{n}{y}\PYG{p}{[:,} \PYG{l+m+mi}{1}\PYG{p}{])}
+      \PYG{c+c1}{\PYGZsh{} Combinar ambos errores}
+      \PYG{n}{loss} \PYG{o}{=} \PYG{p}{(}\PYG{n}{loss1} \PYG{o}{+} \PYG{n}{loss2}\PYG{p}{)}\PYG{o}{/}\PYG{l+m+mi}{2}
+
+      \PYG{c+c1}{\PYGZsh{} Paso de optimización}
+      \PYG{n}{optimizer}\PYG{o}{.}\PYG{n}{zero\PYGZus{}grad}\PYG{p}{()}
+      \PYG{n}{loss}\PYG{o}{.}\PYG{n}{backward}\PYG{p}{()}
+      \PYG{n}{optimizer}\PYG{o}{.}\PYG{n}{step}\PYG{p}{()}
+
+      \PYG{n}{train\PYGZus{}loss} \PYG{o}{+=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{loss}\PYG{o}{.}\PYG{n}{detach}\PYG{p}{())}
+      \PYG{n}{train\PYGZus{}progress}\PYG{o}{.}\PYG{n}{set\PYGZus{}postfix}\PYG{p}{(}\PYG{n}{loss}\PYG{o}{=}\PYG{p}{(}\PYG{n}{train\PYGZus{}loss}\PYG{o}{/}\PYG{p}{(}\PYG{n}{i}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{)))}
+
+    \PYG{n}{model}\PYG{o}{.}\PYG{n}{eval}\PYG{p}{()}
+
+    \PYG{n}{val\PYGZus{}loss} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{k}{with} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{no\PYGZus{}grad}\PYG{p}{():}
+      \PYG{n}{model}\PYG{o}{.}\PYG{n}{eval}\PYG{p}{()}
+      \PYG{n}{val\PYGZus{}progress} \PYG{o}{=} \PYG{n}{tqdm}\PYG{p}{(}\PYG{n+nb}{enumerate}\PYG{p}{(}\PYG{n}{val\PYGZus{}loader}\PYG{p}{),}
+                          \PYG{n}{desc}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}val\PYGZdq{}}\PYG{p}{,}
+                          \PYG{n}{total}\PYG{o}{=}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{val\PYGZus{}loader}\PYG{p}{))}
+      \PYG{k}{for} \PYG{n}{i}\PYG{p}{,} \PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{actions}\PYG{p}{,} \PYG{n}{y}\PYG{p}{)} \PYG{o+ow}{in} \PYG{n}{val\PYGZus{}progress}\PYG{p}{:}
+        \PYG{n}{X} \PYG{o}{=} \PYG{n}{X}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{(}\PYG{n}{non\PYGZus{}blocking}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+        \PYG{n}{actions} \PYG{o}{=} \PYG{n}{actions}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{(}\PYG{n}{non\PYGZus{}blocking}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+        \PYG{n}{y} \PYG{o}{=} \PYG{n}{y}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{(}\PYG{n}{non\PYGZus{}blocking}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+        \PYG{n}{y\PYGZus{}hat} \PYG{o}{=} \PYG{n}{model}\PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{actions}\PYG{p}{)}
+
+        \PYG{n}{loss1} \PYG{o}{=} \PYG{n}{criterion}\PYG{p}{(}\PYG{n}{y\PYGZus{}hat}\PYG{p}{[:,} \PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{y}\PYG{p}{[:,} \PYG{l+m+mi}{0}\PYG{p}{])}
+        \PYG{n}{loss2} \PYG{o}{=} \PYG{n}{criterion}\PYG{p}{(}\PYG{n}{y\PYGZus{}hat}\PYG{p}{[:,} \PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{y}\PYG{p}{[:,} \PYG{l+m+mi}{1}\PYG{p}{])}
+        \PYG{n}{loss} \PYG{o}{=} \PYG{p}{(}\PYG{n}{loss1} \PYG{o}{+} \PYG{n}{loss2}\PYG{p}{)} \PYG{o}{/} \PYG{l+m+mi}{2}
+
+        \PYG{n}{val\PYGZus{}loss} \PYG{o}{+=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{loss}\PYG{p}{)}
+        \PYG{n}{val\PYGZus{}progress}\PYG{o}{.}\PYG{n}{set\PYGZus{}postfix}\PYG{p}{(}\PYG{n}{loss}\PYG{o}{=}\PYG{p}{(}\PYG{n}{val\PYGZus{}loss}\PYG{o}{/}\PYG{p}{(}\PYG{n}{i}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{)))}
+
+    \PYG{n}{end} \PYG{o}{=} \PYG{n}{time}\PYG{o}{.}\PYG{n}{time}\PYG{p}{()}
+
+    \PYG{n}{t\PYGZus{}loss} \PYG{o}{=} \PYG{n}{train\PYGZus{}loss} \PYG{o}{/} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{train\PYGZus{}loader}\PYG{p}{)}
+    \PYG{n}{v\PYGZus{}loss} \PYG{o}{=} \PYG{n}{val\PYGZus{}loss} \PYG{o}{/} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{val\PYGZus{}loader}\PYG{p}{)}
+    \PYG{k}{print}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}epoch:\PYGZsq{}}\PYG{p}{,} \PYG{n}{epoch}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}L:\PYGZsq{}}\PYG{p}{,} \PYG{n}{t\PYGZus{}loss}\PYG{p}{,} \PYG{n}{v\PYGZus{}loss}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Time:\PYGZsq{}}\PYG{p}{,} \PYG{n}{end}\PYG{o}{\PYGZhy{}}\PYG{n}{start}\PYG{p}{)}
+
+    \PYG{n}{torch}\PYG{o}{.}\PYG{n}{save}\PYG{p}{(}
+      \PYG{p}{\PYGZob{}}
+          \PYG{l+s+s1}{\PYGZsq{}epoch\PYGZsq{}}\PYG{p}{:} \PYG{n}{epoch}\PYG{p}{,}
+          \PYG{l+s+s1}{\PYGZsq{}arch\PYGZsq{}}\PYG{p}{:} \PYG{l+s+s1}{\PYGZsq{}mobilenet\PYGZus{}custom\PYGZsq{}}\PYG{p}{,}
+          \PYG{l+s+s1}{\PYGZsq{}state\PYGZus{}dict\PYGZsq{}}\PYG{p}{:} \PYG{n}{model}\PYG{o}{.}\PYG{n}{state\PYGZus{}dict}\PYG{p}{()}
+      \PYG{p}{\PYGZcb{},}
+      \PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}weights/mob\PYGZus{}drive\PYGZus{}\PYGZob{}epoch\PYGZcb{}.pth.tar\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{losses}\PYG{o}{.}\PYG{n}{append}\PYG{p}{([}\PYG{n}{epoch}\PYG{p}{,} \PYG{n}{t\PYGZus{}loss}\PYG{p}{,} \PYG{n}{v\PYGZus{}loss}\PYG{p}{])}
+    \PYG{n}{np}\PYG{o}{.}\PYG{n}{save}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}hist\PYGZus{}drive\PYGZsq{}}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n}{losses}\PYG{p}{))}
+\end{Verbatim}

@@ -1,0 +1,173 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{torch}
+\PYG{k+kn}{import} \PYG{n+nn}{torch.nn} \PYG{k+kn}{as} \PYG{n+nn}{nn}
+\PYG{k+kn}{import} \PYG{n+nn}{torch.nn.parallel}
+\PYG{k+kn}{import} \PYG{n+nn}{torch.optim}
+\PYG{k+kn}{import} \PYG{n+nn}{torch.utils.data}
+\PYG{k+kn}{import} \PYG{n+nn}{torchvision.transforms} \PYG{k+kn}{as} \PYG{n+nn}{transforms}
+\PYG{k+kn}{from} \PYG{n+nn}{models} \PYG{k+kn}{import} \PYG{n}{CustomMobilenet}
+
+\PYG{k+kn}{from} \PYG{n+nn}{PIL} \PYG{k+kn}{import} \PYG{n}{Image}\PYG{p}{,} \PYG{n}{ImageOps}
+\PYG{k+kn}{import} \PYG{n+nn}{os}
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k+kn}{as} \PYG{n+nn}{np}
+\PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k+kn}{as} \PYG{n+nn}{pd}
+\PYG{k+kn}{import} \PYG{n+nn}{time}
+
+\PYG{k+kn}{from} \PYG{n+nn}{tqdm} \PYG{k+kn}{import} \PYG{n}{tqdm}
+
+\PYG{k+kn}{import} \PYG{n+nn}{matplotlib.pyplot} \PYG{k+kn}{as} \PYG{n+nn}{plt}
+
+\PYG{c+c1}{\PYGZsh{} Clase encargada de cargar los datos}
+\PYG{k}{class} \PYG{n+nc}{DriveDepthDataset}\PYG{p}{(}\PYG{n}{torch}\PYG{o}{.}\PYG{n}{utils}\PYG{o}{.}\PYG{n}{data}\PYG{o}{.}\PYG{n}{Dataset}\PYG{p}{):}
+  \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{root\PYGZus{}dir}\PYG{p}{,} \PYG{n}{transform}\PYG{o}{=}\PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{n}{stills}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{):}
+    \PYG{n}{temp} \PYG{o}{=} \PYG{n}{root\PYGZus{}dir}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}/\PYGZsq{}}\PYG{p}{)}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{root\PYGZus{}dir} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}/\PYGZsq{}}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{[:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{])}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{transform} \PYG{o}{=} \PYG{n}{transform}
+
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{data} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}csv}\PYG{p}{(}\PYG{n}{root\PYGZus{}dir}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} Si se desean mantener las imágenes donde el vehículo está quieto}
+    \PYG{k}{if} \PYG{n}{stills}\PYG{p}{:}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{data} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}n\PYGZus{}id\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{tolist}\PYG{p}{()}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{data} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{data}\PYG{o}{.}\PYG{n}{query}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}throttle != 0.0\PYGZsq{}}\PYG{p}{)[}\PYG{l+s+s1}{\PYGZsq{}n\PYGZus{}id\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{tolist}\PYG{p}{()}
+
+  \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}len\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+    \PYG{k}{return} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{data}\PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} Sobrecarga del operador [] para indexado}
+  \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}getitem\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{idx}\PYG{p}{):}
+    \PYG{k}{if} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{is\PYGZus{}tensor}\PYG{p}{(}\PYG{n}{idx}\PYG{p}{):}
+        \PYG{n}{idx} \PYG{o}{=} \PYG{n}{idx}\PYG{o}{.}\PYG{n}{tolist}\PYG{p}{()}
+
+    \PYG{c+c1}{\PYGZsh{} Decidir si espejar la imagen aleatoriamente}
+    \PYG{n}{h\PYGZus{}flip} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{random}\PYG{p}{()} \PYG{o}{\PYGZlt{}} \PYG{l+m+mf}{0.5}
+
+    \PYG{c+c1}{\PYGZsh{} Cargar imagen RGB}
+    \PYG{n}{img\PYGZus{}rgb\PYGZus{}path} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{root\PYGZus{}dir}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}rgb\PYGZsq{}}\PYG{p}{,} \PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}self.data[idx]\PYGZcb{}.png\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{img\PYGZus{}rgb} \PYG{o}{=} \PYG{n}{Image}\PYG{o}{.}\PYG{n}{open}\PYG{p}{(}\PYG{n}{img\PYGZus{}rgb\PYGZus{}path}\PYG{p}{)}
+    \PYG{k}{if} \PYG{n}{h\PYGZus{}flip}\PYG{p}{:}
+        \PYG{n}{img\PYGZus{}rgb} \PYG{o}{=} \PYG{n}{ImageOps}\PYG{o}{.}\PYG{n}{mirror}\PYG{p}{(}\PYG{n}{img\PYGZus{}rgb}\PYG{p}{)}
+    \PYG{k}{if} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{:}
+        \PYG{n}{img\PYGZus{}rgb} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{img\PYGZus{}rgb}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Cargar imagen de profundidad}
+    \PYG{n}{img\PYGZus{}depth\PYGZus{}path} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{root\PYGZus{}dir}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}depth\PYGZsq{}}\PYG{p}{,} \PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}self.data[idx]\PYGZcb{}.png\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{img\PYGZus{}depth} \PYG{o}{=} \PYG{n}{Image}\PYG{o}{.}\PYG{n}{open}\PYG{p}{(}\PYG{n}{img\PYGZus{}depth\PYGZus{}path}\PYG{p}{)}
+    \PYG{k}{if} \PYG{n}{h\PYGZus{}flip}\PYG{p}{:}
+        \PYG{n}{img\PYGZus{}depth} \PYG{o}{=} \PYG{n}{ImageOps}\PYG{o}{.}\PYG{n}{mirror}\PYG{p}{(}\PYG{n}{img\PYGZus{}depth}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Convertir la imagen de 24 bits a un mapa de profundidades [0, 1000]}
+    \PYG{n}{img\PYGZus{}depth} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{asarray}\PYG{p}{(}\PYG{n}{img\PYGZus{}depth}\PYG{p}{,} \PYG{n}{dtype}\PYG{o}{=}\PYG{n}{np}\PYG{o}{.}\PYG{n}{float32}\PYG{p}{),} \PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}
+    \PYG{n}{target} \PYG{o}{=} \PYG{n}{img\PYGZus{}depth}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{p}{:,} \PYG{p}{:]} \PYG{o}{+} \PYG{n}{img\PYGZus{}depth}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{p}{:,} \PYG{p}{:]} \PYG{o}{*} \PYG{l+m+mi}{256} \PYG{o}{+} \PYG{n}{img\PYGZus{}depth}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{p}{:,} \PYG{p}{:]} \PYG{o}{*} \PYG{l+m+mi}{256} \PYG{o}{*} \PYG{l+m+mi}{256}
+
+    \PYG{c+c1}{\PYGZsh{} Truncar las distancias hasta 30 metros como máximo}
+    \PYG{n}{target} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{clip}\PYG{p}{((}\PYG{n}{target} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{256} \PYG{o}{*} \PYG{l+m+mi}{256} \PYG{o}{*} \PYG{l+m+mi}{256} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{))} \PYG{o}{*} \PYG{l+m+mi}{1000}\PYG{p}{,} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{l+m+mi}{30}\PYG{p}{)}
+    \PYG{n}{target} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{from\PYGZus{}numpy}\PYG{p}{(}\PYG{n}{target}\PYG{p}{)}\PYG{o}{.}\PYG{n}{float}\PYG{p}{()}
+
+    \PYG{c+c1}{\PYGZsh{} Crear tupla de la muestra}
+    \PYG{n}{sample} \PYG{o}{=} \PYG{p}{(}\PYG{n}{img\PYGZus{}rgb}\PYG{p}{,} \PYG{n}{target}\PYG{o}{.}\PYG{n}{view}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{target}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{target}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]))}
+
+    \PYG{k}{return} \PYG{n}{sample}
+
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZsq{}}\PYG{p}{:}
+  \PYG{c+c1}{\PYGZsh{} Valores de normalización de la imagen}
+  \PYG{n}{normalize} \PYG{o}{=} \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{Normalize}\PYG{p}{(}\PYG{n}{mean}\PYG{o}{=}\PYG{p}{[}\PYG{l+m+mf}{0.485}\PYG{p}{,} \PYG{l+m+mf}{0.456}\PYG{p}{,} \PYG{l+m+mf}{0.406}\PYG{p}{],}
+                                   \PYG{n}{std}\PYG{o}{=}\PYG{p}{[}\PYG{l+m+mf}{0.229}\PYG{p}{,} \PYG{l+m+mf}{0.224}\PYG{p}{,} \PYG{l+m+mf}{0.225}\PYG{p}{])}
+  \PYG{c+c1}{\PYGZsh{} Instanciar la red de profundidades}
+  \PYG{n}{model} \PYG{o}{=} \PYG{n}{CustomMobilenetDepth}\PYG{p}{((}\PYG{l+m+mi}{180}\PYG{p}{,} \PYG{l+m+mi}{240}\PYG{p}{),} \PYG{n}{pretrained}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{)}
+  \PYG{c+c1}{\PYGZsh{} Enviar parámetros a la GPU}
+  \PYG{n}{model}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{()}
+
+  \PYG{n}{train\PYGZus{}dir} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}path/to/train\PYGZus{}data.csv\PYGZsq{}}
+  \PYG{n}{val\PYGZus{}dir} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}path/to/val\PYGZus{}data.csv\PYGZsq{}}
+
+  \PYG{c+c1}{\PYGZsh{} Instanciar el DataLoader para el conjunto de entrenamiento}
+  \PYG{n}{train\PYGZus{}loader} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{utils}\PYG{o}{.}\PYG{n}{data}\PYG{o}{.}\PYG{n}{DataLoader}\PYG{p}{(}
+    \PYG{n}{dataset}\PYG{o}{=}\PYG{n}{DriveDepthDataset}\PYG{p}{(}\PYG{n}{train\PYGZus{}dir}\PYG{p}{,} \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{Compose}\PYG{p}{([}
+        \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{ToTensor}\PYG{p}{(),}
+        \PYG{k}{lambda} \PYG{n}{T}\PYG{p}{:} \PYG{n}{T}\PYG{p}{[:}\PYG{l+m+mi}{3}\PYG{p}{],}
+        \PYG{n}{normalize}
+    \PYG{p}{])),}
+    \PYG{n}{batch\PYGZus{}size}\PYG{o}{=}\PYG{l+m+mi}{64}\PYG{p}{,}
+    \PYG{n}{shuffle}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{,}
+    \PYG{n}{num\PYGZus{}workers}\PYG{o}{=}\PYG{l+m+mi}{12}\PYG{p}{,}
+    \PYG{n}{pin\PYGZus{}memory}\PYG{o}{=}\PYG{n+nb+bp}{True}
+  \PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} Instanciar el DataLoader para el conjunto de validación}
+  \PYG{n}{val\PYGZus{}loader} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{utils}\PYG{o}{.}\PYG{n}{data}\PYG{o}{.}\PYG{n}{DataLoader}\PYG{p}{(}
+    \PYG{n}{dataset}\PYG{o}{=}\PYG{n}{DriveDepthDataset}\PYG{p}{(}\PYG{n}{val\PYGZus{}dir}\PYG{p}{,} \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{Compose}\PYG{p}{([}
+        \PYG{n}{transforms}\PYG{o}{.}\PYG{n}{ToTensor}\PYG{p}{(),}
+        \PYG{n}{normalize}
+    \PYG{p}{])),}
+    \PYG{n}{batch\PYGZus{}size}\PYG{o}{=}\PYG{l+m+mi}{64}\PYG{p}{,}
+    \PYG{n}{shuffle}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{,}
+    \PYG{n}{num\PYGZus{}workers}\PYG{o}{=}\PYG{l+m+mi}{12}\PYG{p}{,}
+    \PYG{n}{pin\PYGZus{}memory}\PYG{o}{=}\PYG{n+nb+bp}{True}
+  \PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} Definir función de costo a optimizar}
+  \PYG{n}{criterion} \PYG{o}{=} \PYG{n}{nn}\PYG{o}{.}\PYG{n}{MSELoss}\PYG{p}{()}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{()}
+  \PYG{c+c1}{\PYGZsh{} Definir optimizador}
+  \PYG{n}{optimizer} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{optim}\PYG{o}{.}\PYG{n}{Adam}\PYG{p}{(}\PYG{n}{model}\PYG{o}{.}\PYG{n}{parameters}\PYG{p}{())}
+
+  \PYG{c+c1}{\PYGZsh{} Historial de errores}
+  \PYG{n}{losses} \PYG{o}{=} \PYG{p}{[]}
+
+  \PYG{c+c1}{\PYGZsh{} Entrenar por un número de iteraciones o hasta detener el proceso}
+  \PYG{k}{for} \PYG{n}{epoch} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{50}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} Guardar tiempo de inicio de iteración}
+    \PYG{n}{start} \PYG{o}{=} \PYG{n}{time}\PYG{o}{.}\PYG{n}{time}\PYG{p}{()}
+
+    \PYG{c+c1}{\PYGZsh{} Modelo en modo entrenamiento}
+    \PYG{n}{model}\PYG{o}{.}\PYG{n}{train}\PYG{p}{()}
+    \PYG{n}{train\PYGZus{}loss} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{c+c1}{\PYGZsh{} Iterar por los bloques de datos de 64 en 64}
+    \PYG{k}{for} \PYG{n}{i}\PYG{p}{,} \PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{y}\PYG{p}{)} \PYG{o+ow}{in} \PYG{n}{tqdm}\PYG{p}{(}\PYG{n+nb}{enumerate}\PYG{p}{(}\PYG{n}{train\PYGZus{}loader}\PYG{p}{)):}
+      \PYG{n}{X} \PYG{o}{=} \PYG{n}{X}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{(}\PYG{n}{non\PYGZus{}blocking}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+      \PYG{n}{y} \PYG{o}{=} \PYG{n}{y}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{(}\PYG{n}{non\PYGZus{}blocking}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+      \PYG{c+c1}{\PYGZsh{} Realizar la predicción}
+      \PYG{n}{y\PYGZus{}hat} \PYG{o}{=} \PYG{n}{model}\PYG{p}{(}\PYG{n}{X}\PYG{p}{)}
+
+      \PYG{c+c1}{\PYGZsh{} Calcular el error}
+      \PYG{n}{loss} \PYG{o}{=} \PYG{n}{criterion}\PYG{p}{(}\PYG{n}{y\PYGZus{}hat}\PYG{p}{,} \PYG{n}{y}\PYG{p}{)}
+      \PYG{c+c1}{\PYGZsh{} Acumular el error}
+      \PYG{n}{train\PYGZus{}loss} \PYG{o}{+=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{loss}\PYG{o}{.}\PYG{n}{detach}\PYG{p}{())}
+
+      \PYG{c+c1}{\PYGZsh{} Derivar y actualizar los parámetros}
+      \PYG{n}{optimizer}\PYG{o}{.}\PYG{n}{zero\PYGZus{}grad}\PYG{p}{()}
+      \PYG{n}{loss}\PYG{o}{.}\PYG{n}{backward}\PYG{p}{()}
+      \PYG{n}{optimizer}\PYG{o}{.}\PYG{n}{step}\PYG{p}{()}
+
+    \PYG{c+c1}{\PYGZsh{} Evaluar la red en el conjunto de validación cruzada}
+    \PYG{n}{val\PYGZus{}loss} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{k}{with} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{no\PYGZus{}grad}\PYG{p}{():}
+      \PYG{n}{model}\PYG{o}{.}\PYG{n}{eval}\PYG{p}{()}
+      \PYG{k}{for} \PYG{n}{i}\PYG{p}{,} \PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{y}\PYG{p}{)} \PYG{o+ow}{in} \PYG{n+nb}{enumerate}\PYG{p}{(}\PYG{n}{val\PYGZus{}loader}\PYG{p}{):}
+        \PYG{n}{X} \PYG{o}{=} \PYG{n}{X}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{(}\PYG{n}{non\PYGZus{}blocking}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+        \PYG{n}{y} \PYG{o}{=} \PYG{n}{y}\PYG{o}{.}\PYG{n}{cuda}\PYG{p}{(}\PYG{n}{non\PYGZus{}blocking}\PYG{o}{=}\PYG{n+nb+bp}{True}\PYG{p}{)}
+        \PYG{n}{y\PYGZus{}hat} \PYG{o}{=} \PYG{n}{model}\PYG{p}{(}\PYG{n}{X}\PYG{p}{)}
+
+        \PYG{n}{loss} \PYG{o}{=} \PYG{n}{criterion}\PYG{p}{(}\PYG{n}{y\PYGZus{}hat}\PYG{p}{,} \PYG{n}{y}\PYG{p}{)}
+        \PYG{n}{val\PYGZus{}loss} \PYG{o}{+=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{loss}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Guardar el tiempo de finalización de la iteración}
+    \PYG{n}{end} \PYG{o}{=} \PYG{n}{time}\PYG{o}{.}\PYG{n}{time}\PYG{p}{()}
+
+    \PYG{c+c1}{\PYGZsh{} Calcular el error medio de la iteración}
+    \PYG{n}{t\PYGZus{}loss} \PYG{o}{=} \PYG{n}{train\PYGZus{}loss} \PYG{o}{/} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{train\PYGZus{}loader}\PYG{p}{)}
+    \PYG{n}{v\PYGZus{}loss} \PYG{o}{=} \PYG{n}{val\PYGZus{}loss} \PYG{o}{/} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{val\PYGZus{}loader}\PYG{p}{)}
+    \PYG{k}{print}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}epoch:\PYGZsq{}}\PYG{p}{,} \PYG{n}{epoch}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}L:\PYGZsq{}}\PYG{p}{,} \PYG{n}{t\PYGZus{}loss}\PYG{p}{,} \PYG{n}{v\PYGZus{}loss}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Time:\PYGZsq{}}\PYG{p}{,} \PYG{n}{end} \PYG{o}{\PYGZhy{}} \PYG{n}{start}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Guardar los parámetros de la i\PYGZhy{}ésima iteración}
+    \PYG{n}{torch}\PYG{o}{.}\PYG{n}{save}\PYG{p}{(}
+      \PYG{p}{\PYGZob{}}
+        \PYG{l+s+s1}{\PYGZsq{}epoch\PYGZsq{}}\PYG{p}{:} \PYG{n}{epoch}\PYG{p}{,}
+        \PYG{l+s+s1}{\PYGZsq{}arch\PYGZsq{}}\PYG{p}{:} \PYG{l+s+s1}{\PYGZsq{}mobilenet\PYGZus{}depth\PYGZsq{}}\PYG{p}{,}
+        \PYG{l+s+s1}{\PYGZsq{}state\PYGZus{}dict\PYGZsq{}}\PYG{p}{:} \PYG{n}{model}\PYG{o}{.}\PYG{n}{state\PYGZus{}dict}\PYG{p}{()}
+      \PYG{p}{\PYGZcb{},}
+      \PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}weights/c\PYGZus{}mob\PYGZus{}\PYGZob{}epoch\PYGZcb{}.pth.tar\PYGZsq{}}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} Guardar los errores}
+    \PYG{n}{losses}\PYG{o}{.}\PYG{n}{append}\PYG{p}{([}\PYG{n}{epoch}\PYG{p}{,} \PYG{n}{t\PYGZus{}loss}\PYG{p}{,} \PYG{n}{v\PYGZus{}loss}\PYG{p}{])}
+    \PYG{n}{np}\PYG{o}{.}\PYG{n}{save}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}hist\PYGZsq{}}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n}{losses}\PYG{p}{))}
+\end{Verbatim}

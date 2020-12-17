@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{img\PYGZus{}depth} \PYG{o}{=} \PYG{n}{Image}\PYG{o}{.}\PYG{n}{open}\PYG{p}{(}\PYG{n}{img\PYGZus{}depth\PYGZus{}path}\PYG{p}{)}
+\PYG{n}{img\PYGZus{}depth} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{asarray}\PYG{p}{(}\PYG{n}{img\PYGZus{}depth}\PYG{p}{,} \PYG{n}{dtype}\PYG{o}{=}\PYG{n}{np}\PYG{o}{.}\PYG{n}{float32}\PYG{p}{),} \PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}
+\PYG{c+c1}{\PYGZsh{} Escalando valores entre (0 y 1000)}
+\PYG{n}{target} \PYG{o}{=} \PYG{n}{img\PYGZus{}depth}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{p}{:,} \PYG{p}{:]} \PYG{o}{+} \PYG{n}{img\PYGZus{}depth}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{p}{:,} \PYG{p}{:]} \PYG{o}{*} \PYG{l+m+mi}{256} \PYG{o}{+} \PYG{n}{img\PYGZus{}depth}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{p}{:,} \PYG{p}{:]} \PYG{o}{*} \PYG{l+m+mi}{256} \PYG{o}{*} \PYG{l+m+mi}{256}
+\PYG{c+c1}{\PYGZsh{} Truncando hasta máximo 30}
+\PYG{n}{target} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{clip}\PYG{p}{((}\PYG{n}{target} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{256} \PYG{o}{*} \PYG{l+m+mi}{256} \PYG{o}{*} \PYG{l+m+mi}{256} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{))} \PYG{o}{*} \PYG{l+m+mi}{1000}\PYG{p}{,} \PYG{n+nb+bp}{None}\PYG{p}{,} \PYG{l+m+mi}{30}\PYG{p}{)}
+\PYG{n}{target} \PYG{o}{=} \PYG{n}{torch}\PYG{o}{.}\PYG{n}{from\PYGZus{}numpy}\PYG{p}{(}\PYG{n}{target}\PYG{p}{)}\PYG{o}{.}\PYG{n}{float}\PYG{p}{()}
+\end{Verbatim}

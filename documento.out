@@ -1,0 +1,117 @@
+\BOOKMARK [0][-]{chapter.1}{MARCO REFERENCIAL}{}% 1
+\BOOKMARK [1][-]{section.1.1}{INTRODUCCI\323N}{chapter.1}% 2
+\BOOKMARK [1][-]{section.1.2}{ANTECEDENTES}{chapter.1}% 3
+\BOOKMARK [2][-]{subsection.1.2.1}{ESTADO DEL ARTE}{section.1.2}% 4
+\BOOKMARK [3][-]{subsubsection.1.2.1.1}{DETECCI\323N DE OBJETOS}{subsection.1.2.1}% 5
+\BOOKMARK [3][-]{subsubsection.1.2.1.2}{SEGMENTACI\323N SEM\301NTICA}{subsection.1.2.1}% 6
+\BOOKMARK [3][-]{subsubsection.1.2.1.3}{SISTEMAS DE CONDUCCI\323N AUT\323NOMA}{subsection.1.2.1}% 7
+\BOOKMARK [2][-]{subsection.1.2.2}{TRABAJOS SIMILARES}{section.1.2}% 8
+\BOOKMARK [1][-]{section.1.3}{PLANTEAMIENTO DEL PROBLEMA}{chapter.1}% 9
+\BOOKMARK [2][-]{subsection.1.3.1}{PROBLEMA CENTRAL}{section.1.3}% 10
+\BOOKMARK [2][-]{subsection.1.3.2}{PROBLEMAS SECUNDARIOS}{section.1.3}% 11
+\BOOKMARK [1][-]{section.1.4}{DEFINICI\323N DE OBJETIVOS}{chapter.1}% 12
+\BOOKMARK [2][-]{subsection.1.4.1}{OBJETIVO GENERAL}{section.1.4}% 13
+\BOOKMARK [2][-]{subsection.1.4.2}{OBJETIVOS ESPEC\315FICOS}{section.1.4}% 14
+\BOOKMARK [1][-]{section.1.5}{HIP\323TESIS}{chapter.1}% 15
+\BOOKMARK [2][-]{subsection.1.5.1}{OPERACIONALIZACI\323N DE VARIABLES}{section.1.5}% 16
+\BOOKMARK [1][-]{section.1.6}{JUSTIFICACI\323N}{chapter.1}% 17
+\BOOKMARK [2][-]{subsection.1.6.1}{JUSTIFICACI\323N ECON\323MICA}{section.1.6}% 18
+\BOOKMARK [2][-]{subsection.1.6.2}{JUSTIFICACI\323N SOCIAL}{section.1.6}% 19
+\BOOKMARK [2][-]{subsection.1.6.3}{JUSTIFICACI\323N CIENT\315FICA}{section.1.6}% 20
+\BOOKMARK [1][-]{section.1.7}{ALCANCES Y L\315MITES}{chapter.1}% 21
+\BOOKMARK [2][-]{subsection.1.7.1}{ALCANCES}{section.1.7}% 22
+\BOOKMARK [2][-]{subsection.1.7.2}{L\315MITES}{section.1.7}% 23
+\BOOKMARK [1][-]{section.1.8}{APORTES}{chapter.1}% 24
+\BOOKMARK [2][-]{subsection.1.8.1}{PR\301CTICO}{section.1.8}% 25
+\BOOKMARK [2][-]{subsection.1.8.2}{TE\323RICO}{section.1.8}% 26
+\BOOKMARK [1][-]{section.1.9}{METODOLOG\315A}{chapter.1}% 27
+\BOOKMARK [0][-]{chapter.2}{MARCO TE\323RICO}{}% 28
+\BOOKMARK [1][-]{section.2.1}{SISTEMAS DE CONDUCCI\323N AUT\323NOMA}{chapter.2}% 29
+\BOOKMARK [2][-]{subsection.2.1.1}{TAREAS DE LA CONDUCCI\323N AUT\323NOMA}{section.2.1}% 30
+\BOOKMARK [2][-]{subsection.2.1.2}{ARQUITECTURA DE LA CONDUCCI\323N AUT\323NOMA}{section.2.1}% 31
+\BOOKMARK [2][-]{subsection.2.1.3}{CARLA}{section.2.1}% 32
+\BOOKMARK [2][-]{subsection.2.1.4}{NIVELES DE CONDUCCI\323N AUT\323NOMA}{section.2.1}% 33
+\BOOKMARK [1][-]{section.2.2}{VISI\323N COMPUTACIONAL}{chapter.2}% 34
+\BOOKMARK [2][-]{subsection.2.2.1}{PROCESAMIENTO DE IM\301GENES}{section.2.2}% 35
+\BOOKMARK [3][-]{subsubsection.2.2.1.1}{REPRESENTACI\323N DE IM\301GENES EN UNA COMPUTADORA}{subsection.2.2.1}% 36
+\BOOKMARK [3][-]{subsubsection.2.2.1.2}{CONVOLUCI\323N}{subsection.2.2.1}% 37
+\BOOKMARK [3][-]{subsubsection.2.2.1.3}{DETECCI\323N DE CONTORNOS}{subsection.2.2.1}% 38
+\BOOKMARK [2][-]{subsection.2.2.2}{TRANSFORMACIONES MORFOL\323GICAS}{section.2.2}% 39
+\BOOKMARK [3][-]{subsubsection.2.2.2.1}{DILATACI\323N}{subsection.2.2.2}% 40
+\BOOKMARK [3][-]{subsubsection.2.2.2.2}{EROSI\323N}{subsection.2.2.2}% 41
+\BOOKMARK [3][-]{subsubsection.2.2.2.3}{APERTURA}{subsection.2.2.2}% 42
+\BOOKMARK [2][-]{subsection.2.2.3}{K-MEANS}{section.2.2}% 43
+\BOOKMARK [2][-]{subsection.2.2.4}{FLOOD FILL}{section.2.2}% 44
+\BOOKMARK [1][-]{section.2.3}{APRENDIZAJE AUTOM\301TICO}{chapter.2}% 45
+\BOOKMARK [2][-]{subsection.2.3.1}{APRENDIZAJE SUPERVISADO}{section.2.3}% 46
+\BOOKMARK [3][-]{subsubsection.2.3.1.1}{APRENDIZAJE CORRECTO PROBABLEMENTE APROXIMADO}{subsection.2.3.1}% 47
+\BOOKMARK [2][-]{subsection.2.3.2}{REGRESI\323N}{section.2.3}% 48
+\BOOKMARK [3][-]{subsubsection.2.3.2.1}{REGRESI\323N LINEAL}{subsection.2.3.2}% 49
+\BOOKMARK [3][-]{subsubsection.2.3.2.2}{REGRESI\323N GENERALIZADA}{subsection.2.3.2}% 50
+\BOOKMARK [3][-]{subsubsection.2.3.2.3}{MEDIAS M\323VILES EXPONENCIALES}{subsection.2.3.2}% 51
+\BOOKMARK [2][-]{subsection.2.3.3}{CLASIFICACI\323N}{section.2.3}% 52
+\BOOKMARK [3][-]{subsubsection.2.3.3.1}{REGRESI\323N SOFTMAX}{subsection.2.3.3}% 53
+\BOOKMARK [2][-]{subsection.2.3.4}{DESCENSO DEL GRADIENTE ESTOC\301STICO}{section.2.3}% 54
+\BOOKMARK [2][-]{subsection.2.3.5}{ADAM}{section.2.3}% 55
+\BOOKMARK [1][-]{section.2.4}{APRENDIZAJE PROFUNDO}{chapter.2}% 56
+\BOOKMARK [2][-]{subsection.2.4.1}{PERCEPTR\323N MULTICAPA}{section.2.4}% 57
+\BOOKMARK [3][-]{subsubsection.2.4.1.1}{FUNCIONES DE ACTIVACI\323N}{subsection.2.4.1}% 58
+\BOOKMARK [3][-]{subsubsection.2.4.1.2}{RETROPROPAGACI\323N DE LOS ERRORES}{subsection.2.4.1}% 59
+\BOOKMARK [2][-]{subsection.2.4.2}{REDES NEURONALES CONVOLUCIONALES}{section.2.4}% 60
+\BOOKMARK [3][-]{subsubsection.2.4.2.1}{STRIDES}{subsection.2.4.2}% 61
+\BOOKMARK [3][-]{subsubsection.2.4.2.2}{POOLING}{subsection.2.4.2}% 62
+\BOOKMARK [3][-]{subsubsection.2.4.2.3}{MOBILENET V2}{subsection.2.4.2}% 63
+\BOOKMARK [3][-]{subsubsection.2.4.2.4}{FAST DEPTH}{subsection.2.4.2}% 64
+\BOOKMARK [2][-]{subsection.2.4.3}{APRENDIZAJE DE REPRESENTACIONES PROFUNDAS}{section.2.4}% 65
+\BOOKMARK [1][-]{section.2.5}{M\311TRICAS DE ERROR}{chapter.2}% 66
+\BOOKMARK [2][-]{subsection.2.5.1}{ERROR CUADR\301TICO MEDIO}{section.2.5}% 67
+\BOOKMARK [2][-]{subsection.2.5.2}{ERROR ABSOLUTO MEDIO}{section.2.5}% 68
+\BOOKMARK [2][-]{subsection.2.5.3}{PRECISI\323N Y EXHAUSTIVIDAD}{section.2.5}% 69
+\BOOKMARK [2][-]{subsection.2.5.4}{\315NDICE JACCARD}{section.2.5}% 70
+\BOOKMARK [1][-]{section.2.6}{COMPILACI\323N EN TIEMPO DE EJECUCI\323N}{chapter.2}% 71
+\BOOKMARK [0][-]{chapter.3}{MARCO APLICATIVO}{}% 72
+\BOOKMARK [1][-]{section.3.1}{COMPRENSI\323N DEL PROYECTO}{chapter.3}% 73
+\BOOKMARK [1][-]{section.3.2}{COMPRENSI\323N DE LOS DATOS}{chapter.3}% 74
+\BOOKMARK [2][-]{subsection.3.2.1}{ACELERADOR Y DIRECCI\323N}{section.3.2}% 75
+\BOOKMARK [2][-]{subsection.3.2.2}{PROFUNDIDAD}{section.3.2}% 76
+\BOOKMARK [2][-]{subsection.3.2.3}{SEGMENTACI\323N SEM\301NTICA}{section.3.2}% 77
+\BOOKMARK [1][-]{section.3.3}{PREPARACI\323N DE DATOS}{chapter.3}% 78
+\BOOKMARK [2][-]{subsection.3.3.1}{UNI\323N DE DATAFRAMES}{section.3.3}% 79
+\BOOKMARK [2][-]{subsection.3.3.2}{ETIQUETADO DE INTERSECCIONES}{section.3.3}% 80
+\BOOKMARK [2][-]{subsection.3.3.3}{CONCATENACI\323N DE ATRIBUTOS}{section.3.3}% 81
+\BOOKMARK [1][-]{section.3.4}{MODELADO}{chapter.3}% 82
+\BOOKMARK [2][-]{subsection.3.4.1}{RED DE CONDUCCI\323N}{section.3.4}% 83
+\BOOKMARK [2][-]{subsection.3.4.2}{RED DE PROFUNDIDAD}{section.3.4}% 84
+\BOOKMARK [2][-]{subsection.3.4.3}{RED DE SEGMENTACI\323N SEM\301NTICA}{section.3.4}% 85
+\BOOKMARK [2][-]{subsection.3.4.4}{SUAVIZADO DE DIRECCI\323N}{section.3.4}% 86
+\BOOKMARK [2][-]{subsection.3.4.5}{CAJA DELIMITADORA}{section.3.4}% 87
+\BOOKMARK [2][-]{subsection.3.4.6}{CUANTIFICACI\323N DIGITAL DEL COLOR}{section.3.4}% 88
+\BOOKMARK [2][-]{subsection.3.4.7}{MODELO PARA LA CONDUCCI\323N AUT\323NOMA}{section.3.4}% 89
+\BOOKMARK [1][-]{section.3.5}{EVALUACI\323N}{chapter.3}% 90
+\BOOKMARK [2][-]{subsection.3.5.1}{DRIVENET}{section.3.5}% 91
+\BOOKMARK [2][-]{subsection.3.5.2}{DEPTHNET}{section.3.5}% 92
+\BOOKMARK [2][-]{subsection.3.5.3}{SEMSEGNET}{section.3.5}% 93
+\BOOKMARK [2][-]{subsection.3.5.4}{CENTROIDES K-MEANS}{section.3.5}% 94
+\BOOKMARK [1][-]{section.3.6}{DESPLIEGUE}{chapter.3}% 95
+\BOOKMARK [0][-]{chapter.4}{RESULTADOS Y AN\301LISIS}{}% 96
+\BOOKMARK [1][-]{section.4.1}{RENDIMIENTO DE LOS M\323DULOS}{chapter.4}% 97
+\BOOKMARK [2][-]{subsection.4.1.1}{ACELERACI\323N Y GIRO}{section.4.1}% 98
+\BOOKMARK [2][-]{subsection.4.1.2}{ESTIMACI\323N DE PROFUNDIDAD}{section.4.1}% 99
+\BOOKMARK [2][-]{subsection.4.1.3}{SEGMENTACI\323N SEM\301NTICA}{section.4.1}% 100
+\BOOKMARK [3][-]{subsubsection.4.1.3.1}{MATRIZ DE CONFUSI\323N}{subsection.4.1.3}% 101
+\BOOKMARK [3][-]{subsubsection.4.1.3.2}{PRECISI\323N Y EXHAUSTIVIDAD}{subsection.4.1.3}% 102
+\BOOKMARK [3][-]{subsubsection.4.1.3.3}{CAJAS DELIMITADORAS}{subsection.4.1.3}% 103
+\BOOKMARK [3][-]{subsubsection.4.1.3.4}{\315NDICE JACCARD}{subsection.4.1.3}% 104
+\BOOKMARK [2][-]{subsection.4.1.4}{DETECCI\323N Y CLASIFICACI\323N DE SEM\301FOROS}{section.4.1}% 105
+\BOOKMARK [1][-]{section.4.2}{REPRESENTACIONES APRENDIDAS}{chapter.4}% 106
+\BOOKMARK [2][-]{subsection.4.2.1}{DISTANCIAS EN LA REGI\323N DE INTER\311S}{section.4.2}% 107
+\BOOKMARK [2][-]{subsection.4.2.2}{VISUALIZACI\323N DE ZONAS DE INTER\311S}{section.4.2}% 108
+\BOOKMARK [1][-]{section.4.3}{PRUEBAS EN SIMULADOR}{chapter.4}% 109
+\BOOKMARK [2][-]{subsection.4.3.1}{CONDUCCI\323N}{section.4.3}% 110
+\BOOKMARK [2][-]{subsection.4.3.2}{FALLOS}{section.4.3}% 111
+\BOOKMARK [1][-]{section.4.4}{PRUEBA DE LA HIP\323TESIS}{chapter.4}% 112
+\BOOKMARK [0][-]{chapter.5}{CONCLUSIONES Y RECOMENDACIONES}{}% 113
+\BOOKMARK [1][-]{section.5.1}{CONCLUSIONES}{chapter.5}% 114
+\BOOKMARK [1][-]{section.5.2}{RECOMENDACIONES}{chapter.5}% 115
+\BOOKMARK [0][-]{chapter.6}{BIBLIOGRAF\315A}{}% 116
+\BOOKMARK [0][-]{section*.57}{ANEXOS}{}% 117

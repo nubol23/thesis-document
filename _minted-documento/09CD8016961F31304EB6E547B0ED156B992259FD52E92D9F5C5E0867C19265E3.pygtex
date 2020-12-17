@@ -1,0 +1,51 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k+kn}{as} \PYG{n+nn}{pd}
+\PYG{k+kn}{import} \PYG{n+nn}{os}
+\PYG{k+kn}{from} \PYG{n+nn}{shutil} \PYG{k+kn}{import} \PYG{n}{copy}
+\PYG{k+kn}{from} \PYG{n+nn}{tqdm} \PYG{k+kn}{import} \PYG{n}{tqdm}
+
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZsq{}}\PYG{p}{:}
+  \PYG{n}{df} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}csv}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}path/to/train\PYGZus{}dataset.csv\PYGZsq{}}\PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} Crear colúmnas para la carpeta y el archivo}
+  \PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}folder\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{p}{[}\PYG{n}{f}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}/\PYGZsq{}}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{k}{for} \PYG{n}{f} \PYG{o+ow}{in} \PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}filenames\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{tolist}\PYG{p}{()]}
+  \PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}file\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{p}{[}\PYG{n}{f}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}/\PYGZsq{}}\PYG{p}{)[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}.\PYGZsq{}}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{k}{for} \PYG{n}{f} \PYG{o+ow}{in} \PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}filenames\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{tolist}\PYG{p}{()]}
+
+  \PYG{c+c1}{\PYGZsh{} Se elimina la colúmna que contiene ambos en uno}
+  \PYG{n}{df} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{([}\PYG{l+s+s1}{\PYGZsq{}filenames\PYGZsq{}}\PYG{p}{],} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} Seleccionar las filas de intersecciones}
+  \PYG{n}{df\PYGZus{}junc} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{query}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}junction == True\PYGZsq{}}\PYG{p}{)}
+
+  \PYG{c+c1}{\PYGZsh{} Extraer la lísta de índices}
+  \PYG{n}{idxs} \PYG{o}{=} \PYG{n}{df\PYGZus{}junc}\PYG{o}{.}\PYG{n}{index}\PYG{o}{.}\PYG{n}{tolist}\PYG{p}{()}
+
+  \PYG{c+c1}{\PYGZsh{} Se buscan las intersecciones}
+  \PYG{n}{diffs} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{idxs}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+  \PYG{n}{junc\PYGZus{}idxs} \PYG{o}{=} \PYG{p}{[]}
+  \PYG{n}{temp\PYGZus{}idxs} \PYG{o}{=} \PYG{p}{[]}
+  \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{idxs}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} Si la diferencia de índices es grande}
+    \PYG{c+c1}{\PYGZsh{} son intersecciones distintas}
+    \PYG{n}{diff} \PYG{o}{=} \PYG{n}{idxs}\PYG{p}{[}\PYG{n}{i}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{idxs}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}
+
+    \PYG{n}{temp\PYGZus{}idxs}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{idxs}\PYG{p}{[}\PYG{n}{i}\PYG{p}{])}
+    \PYG{k}{if} \PYG{n}{diff} \PYG{o}{!=} \PYG{l+m+mi}{1} \PYG{o+ow}{and} \PYG{p}{(}\PYG{n}{idxs}\PYG{p}{[}\PYG{n}{i}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{!=} \PYG{l+m+mi}{7999} \PYG{o+ow}{and} \PYG{n}{idxs}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{!=} \PYG{l+m+mi}{0}\PYG{p}{):}
+        \PYG{n}{junc\PYGZus{}idxs}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{temp\PYGZus{}idxs}\PYG{p}{)}
+        \PYG{n}{temp\PYGZus{}idxs} \PYG{o}{=} \PYG{p}{[]}
+
+  \PYG{c+c1}{\PYGZsh{} Ubicación de las carpetas para cada intersección}
+  \PYG{n}{base\PYGZus{}path} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}path/to/junctions\PYGZsq{}}
+  \PYG{c+c1}{\PYGZsh{} Ubicación de las imágenes originales}
+  \PYG{n}{origin\PYGZus{}path} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}path/to/Images\PYGZsq{}}
+
+  \PYG{k}{for} \PYG{n}{i}\PYG{p}{,} \PYG{n}{junc\PYGZus{}img\PYGZus{}idxs} \PYG{o+ow}{in} \PYG{n}{tqdm}\PYG{p}{(}\PYG{n+nb}{enumerate}\PYG{p}{(}\PYG{n}{junc\PYGZus{}idxs}\PYG{p}{)):}
+    \PYG{c+c1}{\PYGZsh{} Crear carpeta por intersección}
+    \PYG{n}{os}\PYG{o}{.}\PYG{n}{makedirs}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}base\PYGZus{}path\PYGZcb{}/\PYGZob{}i\PYGZcb{}\PYGZsq{}}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{idx} \PYG{o+ow}{in} \PYG{n}{junc\PYGZus{}img\PYGZus{}idxs}\PYG{p}{:}
+      \PYG{n}{row} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{iloc}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]}
+      \PYG{n}{folder}\PYG{p}{,} \PYG{n+nb}{file} \PYG{o}{=} \PYG{n}{row}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}filenames\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}/\PYGZsq{}}\PYG{p}{)}
+
+      \PYG{c+c1}{\PYGZsh{} Copiar la imagen a su respectiva carpeta}
+      \PYG{n}{copy}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}origin\PYGZus{}path\PYGZcb{}/\PYGZob{}folder\PYGZcb{}/rgb/\PYGZob{}file\PYGZcb{}\PYGZsq{}}\PYG{p}{,} \PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}base\PYGZus{}path\PYGZcb{}/\PYGZob{}i\PYGZcb{}/\PYGZob{}folder\PYGZcb{}\PYGZus{}\PYGZob{}file\PYGZcb{}\PYGZsq{}}\PYG{p}{)}
+\end{Verbatim}

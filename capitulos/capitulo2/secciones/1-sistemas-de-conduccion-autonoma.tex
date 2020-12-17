@@ -1,0 +1,61 @@
+\section{SISTEMAS DE CONDUCCIÓN AUTÓNOMA}
+    Un sistema de conducción autónoma es una combinación de varios componentes o subsistemas donde las tareas de percepción, toma de decisiones y operación de un vehículo son desarrolladas por un sistema electrónico en lugar de un conductor humano
+    \subsection{TAREAS DE LA CONDUCCIÓN AUTÓNOMA}
+    Para lograr la conducción autónoma, se deben dividir tareas modulares, esto con el fin de poder realizar pruebas de cada componente y en caso de fallos, poder detectarlos aisladamente y que no afecten a los demás componentes.
+    
+    Las tareas son:
+    \begin{itemize}[nosep]
+        \item \textbf{Control lateral:} Control de la dirección o volante del vehículo.
+        \item \textbf{Control longitudinal:} Control de la aceleración y freno.
+        \item \textbf{Detección y respuesta de eventos y objetos:} (OEDR por sus siglas en inglés) detección de objetos importantes en la carretera como carriles y vehículos, también objetos fuera de la carretera como peatones o señales de tránsito. Como respuesta debe reaccionar a distintas situaciones peligrosas tanto deteniendo el coche o sacándolo de esa situación.
+        \item \textbf{Planeamiento:} A corto plazo son las acciones inmediatas que debe tomar y modificar el camino ante adversidades, y a largo plazo es el mejor camino encontrado desde el origen al destino definido por el usuario.
+    \end{itemize}
+    estas están definidas en el documento de recomendaciones para vehículos autónomos de la Sociedad Internacional de Ingenieros de Automoción (SAE por sus siglas en inglés). \citep{J3016_201806}
+    % \subsection{NIVELES DE AUTONOMÍA}
+    % https://www.nhtsa.gov/technology-innovation/automated-vehicles-safety
+    \subsection{ARQUITECTURA DE LA CONDUCCIÓN AUTÓNOMA}
+    La arquitectura del software para la conducción autónoma se basa en una fase de adquisición de datos para entrenar los modelos predictivos y ajustar los algoritmos, y a partir de ahí una fase de inferencia, la cual tiene cuatro componentes principales:
+    
+    \begin{itemize}[nosep]
+        \item \textbf{Percepción del ambiente:} Aquí se encuentran todos los modelos y algoritmos que nos permiten detectar objetos de interés a través de los sensores disponibles.
+        \item \textbf{Mapeo del ambiente:} Una vez extraídos los objetos de interés, se procede a ubicarlos en posiciones relativas al vehículo.
+        \item \textbf{Planificación de movimiento:} Se procede a armar un plan de acción para el estado del ambiente que se percibe en ese instante.
+        \item \textbf{Control:} Una vez se realiza el plan de acción, se ejecuta enviando la información a los controladores de aceleración, freno y dirección.
+    \end{itemize}
+	
+	\subsection{CARLA}
+		CARLA es un simulador de código libre, desarrollado sobre Unreal Engine 4, para la investigación de la conducción autónoma, al ser pensado para esta tarea, provee una interfaz de comunicación a través de código en C++ y Python mediante su librería. Cuenta con distintos tipos de climas desde el día despejado hasta tardes lluviosas además de distintos modelos de vehículos y pedestres para lograr una simulación realista.
+		
+		La funcionalidad más importante de carla es poder extraer la imagen de cámaras y sensores virtuales para generar datos de entrenamiento, y poder controlar el vehículo mediante código para realizar pruebas de modelos aprendidos \citep{Dosovitskiy17}.
+		
+	\subsection{NIVELES DE CONDUCCIÓN AUTÓNOMA}
+	La Sociedad de Ingenieros de Automoción internacional definió 5 niveles de conducción autónomas con sus características.
+	
+	\begingroup
+%	\baselinestretch{1em}
+	\setstretch{1.2}
+	\begin{center}
+		\footnotesize
+		\begin{tabularx}{\textwidth}{|l|X|}
+			\hline
+			\textbf{Nivel de automatización} & \textbf{Tareas} \\
+			\hline
+			Nivel 0 & No existe ningún tipo de automatización y el conductor humano se encarga de todo \\
+			\hline
+			Nivel 1 & El sistema puede realizar el control longitudinal (aceleración) o lateral (giro), no ambos. \\
+			\hline
+			Nivel 2 & El sistema puede realizar el control longitudinal (aceleración) y lateral (giro). \\
+			\hline
+			Nivel 3 & Puede realizar el control del nivel 2 más cambios de carriles y reacción ante situaciones adversas en ciertos tipos de ambientes para los que se programó, cuando detecta que ya no está en un ambiente conocido se desactiva. \\
+			\hline
+			Nivel 4 & Puede realizar todo lo descrito en el nivel 3 y aparte cuando detecta algún tipo de falla o sale de un ambiente conocido, lleva al vehículo a un lugar seguro para desactivarse y que el usuario tome el control. \\
+			\hline
+			Nivel 5 & Puede realizar una conducción autónoma total, invariante a cualquier situación y lugar. \\
+			\hline
+		\end{tabularx}
+		 
+		\captionof{table}[Niveles de Conducción Autónoma]{niveles de conducción autónoma Fuente:\citep{J3016_201806}}\label{niveles}
+	\end{center}
+	\endgroup
+	\vspace{-4mm}
+	Se considera como nivel básico de conducción autónoma a las tareas de control descrito en el nivel 2.

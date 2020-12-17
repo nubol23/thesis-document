@@ -1,0 +1,195 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{pickle}
+\PYG{k+kn}{import} \PYG{n+nn}{torch}
+\PYG{k+kn}{import} \PYG{n+nn}{torchvision.transforms} \PYG{k+kn}{as} \PYG{n+nn}{transforms}
+\PYG{k+kn}{from} \PYG{n+nn}{torchvision.models} \PYG{k+kn}{import} \PYG{n}{mobilenet\PYGZus{}v2}
+\PYG{k+kn}{import} \PYG{n+nn}{torch.nn} \PYG{k+kn}{as} \PYG{n+nn}{nn}
+\PYG{k+kn}{import} \PYG{n+nn}{glob}
+\PYG{k+kn}{import} \PYG{n+nn}{os}
+\PYG{k+kn}{import} \PYG{n+nn}{sys}
+
+\PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{glob}\PYG{o}{.}\PYG{n}{glob}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}../carla/dist/carla\PYGZhy{}*}\PYG{l+s+si}{\PYGZpc{}d}\PYG{l+s+s1}{.}\PYG{l+s+si}{\PYGZpc{}d}\PYG{l+s+s1}{\PYGZhy{}}\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s1}{.egg\PYGZsq{}} \PYG{o}{\PYGZpc{}} \PYG{p}{(}
+  \PYG{n}{sys}\PYG{o}{.}\PYG{n}{version\PYGZus{}info}\PYG{o}{.}\PYG{n}{major}\PYG{p}{,}
+  \PYG{n}{sys}\PYG{o}{.}\PYG{n}{version\PYGZus{}info}\PYG{o}{.}\PYG{n}{minor}\PYG{p}{,}
+  \PYG{l+s+s1}{\PYGZsq{}win\PYGZhy{}amd64\PYGZsq{}} \PYG{k}{if} \PYG{n}{os}\PYG{o}{.}\PYG{n}{name} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}nt\PYGZsq{}} \PYG{k}{else} \PYG{l+s+s1}{\PYGZsq{}linux\PYGZhy{}x86\PYGZus{}64\PYGZsq{}}\PYG{p}{))[}\PYG{l+m+mi}{0}\PYG{p}{])}
+\PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}../carla\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}path/to/DriveNet\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}path/to/DepthNet\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{sys}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}path/to/SemsegNet\PYGZsq{}}\PYG{p}{)}
+
+\PYG{k+kn}{from} \PYG{n+nn}{sync\PYGZus{}mode} \PYG{k+kn}{import} \PYG{n}{CarlaSyncMode} \PYG{c+c1}{\PYGZsh{} Clase incluida en los ejemplos de Carla}
+\PYG{k+kn}{import} \PYG{n+nn}{carla}
+
+\PYG{k+kn}{import} \PYG{n+nn}{pygame}
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k+kn}{as} \PYG{n+nn}{np}
+\PYG{k+kn}{import} \PYG{n+nn}{re}
+\PYG{k+kn}{import} \PYG{n+nn}{cv2}
+
+\PYG{k}{def} \PYG{n+nf}{should\PYGZus{}quit}\PYG{p}{():}
+  \PYG{c+c1}{\PYGZsh{} función incluida con la API de Carla}
+  \PYG{k}{for} \PYG{n}{event} \PYG{o+ow}{in} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{event}\PYG{o}{.}\PYG{n}{get}\PYG{p}{():}
+    \PYG{k}{if} \PYG{n}{event}\PYG{o}{.}\PYG{n}{type} \PYG{o}{==} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{QUIT}\PYG{p}{:}
+      \PYG{k}{return} \PYG{n+nb+bp}{True}
+    \PYG{k}{elif} \PYG{n}{event}\PYG{o}{.}\PYG{n}{type} \PYG{o}{==} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{KEYUP}\PYG{p}{:}
+      \PYG{k}{if} \PYG{n}{event}\PYG{o}{.}\PYG{n}{key} \PYG{o}{==} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{K\PYGZus{}ESCAPE}\PYG{p}{:}
+        \PYG{k}{return} \PYG{n+nb+bp}{True}
+  \PYG{k}{return} \PYG{n+nb+bp}{False}
+
+\PYG{k}{def} \PYG{n+nf}{img\PYGZus{}to\PYGZus{}array}\PYG{p}{(}\PYG{n}{image}\PYG{p}{):}
+  \PYG{n}{array} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{frombuffer}\PYG{p}{(}\PYG{n}{image}\PYG{o}{.}\PYG{n}{raw\PYGZus{}data}\PYG{p}{,} \PYG{n}{dtype}\PYG{o}{=}\PYG{n}{np}\PYG{o}{.}\PYG{n}{dtype}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}uint8\PYGZdq{}}\PYG{p}{))}
+  \PYG{n}{array} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{array}\PYG{p}{,} \PYG{p}{(}\PYG{n}{image}\PYG{o}{.}\PYG{n}{height}\PYG{p}{,} \PYG{n}{image}\PYG{o}{.}\PYG{n}{width}\PYG{p}{,} \PYG{l+m+mi}{4}\PYG{p}{))}
+  \PYG{n}{array} \PYG{o}{=} \PYG{n}{array}\PYG{p}{[:,} \PYG{p}{:,} \PYG{p}{:}\PYG{l+m+mi}{3}\PYG{p}{]}
+  \PYG{k}{return} \PYG{n}{array}
+
+
+\PYG{k}{def} \PYG{n+nf}{show\PYGZus{}window}\PYG{p}{(}\PYG{n}{surface}\PYG{p}{,} \PYG{n}{array}\PYG{p}{,} \PYG{n}{pos}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{)):}
+  \PYG{k}{if} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{array}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{2}\PYG{p}{:}
+    \PYG{n}{array} \PYG{o}{=} \PYG{n}{array}\PYG{p}{[:,} \PYG{p}{:,} \PYG{p}{::}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]}
+  \PYG{n}{image\PYGZus{}surface} \PYG{o}{=} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{surfarray}\PYG{o}{.}\PYG{n}{make\PYGZus{}surface}\PYG{p}{(}\PYG{n}{array}\PYG{o}{.}\PYG{n}{swapaxes}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}
+  \PYG{n}{surface}\PYG{o}{.}\PYG{n}{blit}\PYG{p}{(}\PYG{n}{image\PYGZus{}surface}\PYG{p}{,} \PYG{n}{pos}\PYG{p}{)}
+
+
+\PYG{k}{def} \PYG{n+nf}{create\PYGZus{}camera}\PYG{p}{(}\PYG{n}{cam\PYGZus{}type}\PYG{p}{,} \PYG{n}{vehicle}\PYG{p}{,} \PYG{n}{pos}\PYG{p}{,} \PYG{n}{h}\PYG{p}{,} \PYG{n}{w}\PYG{p}{,} \PYG{n}{lib}\PYG{p}{,} \PYG{n}{world}\PYG{p}{):}
+  \PYG{n}{cam} \PYG{o}{=} \PYG{n}{lib}\PYG{o}{.}\PYG{n}{find}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}sensor.camera.\PYGZob{}cam\PYGZus{}type\PYGZcb{}\PYGZsq{}}\PYG{p}{)}
+  \PYG{n}{cam}\PYG{o}{.}\PYG{n}{set\PYGZus{}attribute}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}image\PYGZus{}size\PYGZus{}x\PYGZsq{}}\PYG{p}{,} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{w}\PYG{p}{))}
+  \PYG{n}{cam}\PYG{o}{.}\PYG{n}{set\PYGZus{}attribute}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}image\PYGZus{}size\PYGZus{}y\PYGZsq{}}\PYG{p}{,} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{h}\PYG{p}{))}
+  \PYG{n}{camera} \PYG{o}{=} \PYG{n}{world}\PYG{o}{.}\PYG{n}{spawn\PYGZus{}actor}\PYG{p}{(}
+    \PYG{n}{cam}\PYG{p}{,}
+    \PYG{n}{pos}\PYG{p}{,}
+    \PYG{n}{attach\PYGZus{}to}\PYG{o}{=}\PYG{n}{vehicle}\PYG{p}{,}
+    \PYG{n}{attachment\PYGZus{}type}\PYG{o}{=}\PYG{n}{carla}\PYG{o}{.}\PYG{n}{AttachmentType}\PYG{o}{.}\PYG{n}{Rigid}\PYG{p}{)}
+  \PYG{k}{return} \PYG{n}{camera}
+
+\PYG{k}{def} \PYG{n+nf}{find\PYGZus{}weather\PYGZus{}presets}\PYG{p}{():}
+  \PYG{c+c1}{\PYGZsh{} función incluida con la API de Carla}
+  \PYG{n}{rgx} \PYG{o}{=} \PYG{n}{re}\PYG{o}{.}\PYG{n}{compile}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}.+?(?:(?\PYGZlt{}=[a\PYGZhy{}z])(?=[A\PYGZhy{}Z])|(?\PYGZlt{}=[A\PYGZhy{}Z])(?=[A\PYGZhy{}Z][a\PYGZhy{}z])|\PYGZdl{})\PYGZsq{}}\PYG{p}{)}
+
+  \PYG{k}{def} \PYG{n+nf}{name}\PYG{p}{(}\PYG{n}{x}\PYG{p}{):} \PYG{k}{return} \PYG{l+s+s1}{\PYGZsq{} \PYGZsq{}}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{m}\PYG{o}{.}\PYG{n}{group}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)} \PYG{k}{for} \PYG{n}{m} \PYG{o+ow}{in} \PYG{n}{rgx}\PYG{o}{.}\PYG{n}{finditer}\PYG{p}{(}\PYG{n}{x}\PYG{p}{))}
+
+  \PYG{n}{presets} \PYG{o}{=} \PYG{p}{[}\PYG{n}{x} \PYG{k}{for} \PYG{n}{x} \PYG{o+ow}{in} \PYG{n+nb}{dir}\PYG{p}{(}\PYG{n}{carla}\PYG{o}{.}\PYG{n}{WeatherParameters}\PYG{p}{)} \PYG{k}{if} \PYG{n}{re}\PYG{o}{.}\PYG{n}{match}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}[A\PYGZhy{}Z].+\PYGZsq{}}\PYG{p}{,} \PYG{n}{x}\PYG{p}{)]}
+  \PYG{k}{return} \PYG{p}{[(}\PYG{n+nb}{getattr}\PYG{p}{(}\PYG{n}{carla}\PYG{o}{.}\PYG{n}{WeatherParameters}\PYG{p}{,} \PYG{n}{x}\PYG{p}{),} \PYG{n}{name}\PYG{p}{(}\PYG{n}{x}\PYG{p}{))} \PYG{k}{for} \PYG{n}{x} \PYG{o+ow}{in} \PYG{n}{presets}\PYG{p}{]}
+
+
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZsq{}}\PYG{p}{:}
+  \PYG{k}{try}\PYG{p}{:}
+    \PYG{n}{actor\PYGZus{}list} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{n}{base\PYGZus{}path} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}path/to/dataset\PYGZsq{}}
+    \PYG{c+c1}{\PYGZsh{} Número de simulación}
+    \PYG{n}{n\PYGZus{}sim} \PYG{o}{=} \PYG{l+m+mi}{1}
+
+    \PYG{c+c1}{\PYGZsh{} Crear las carpetas para las imágenes de la simulación}
+    \PYG{n}{os}\PYG{o}{.}\PYG{n}{makedirs}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}base\PYGZus{}path\PYGZcb{}/Images/\PYGZob{}n\PYGZus{}sim\PYGZcb{}/rgb/\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{os}\PYG{o}{.}\PYG{n}{makedirs}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}base\PYGZus{}path\PYGZcb{}/Images/\PYGZob{}n\PYGZus{}sim\PYGZcb{}/depth/\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{os}\PYG{o}{.}\PYG{n}{makedirs}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}base\PYGZus{}path\PYGZcb{}/Images/\PYGZob{}n\PYGZus{}sim\PYGZcb{}/mask/\PYGZsq{}}\PYG{p}{)}
+
+    \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{init}\PYG{p}{()}
+    \PYG{n}{w}\PYG{p}{,} \PYG{n}{h} \PYG{o}{=} \PYG{l+m+mi}{240}\PYG{p}{,} \PYG{l+m+mi}{180}
+    \PYG{n}{display} \PYG{o}{=} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{display}\PYG{o}{.}\PYG{n}{set\PYGZus{}mode}\PYG{p}{((}\PYG{n}{w}\PYG{p}{,} \PYG{n}{h}\PYG{p}{),} 
+                                      \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{HWSURFACE} \PYG{o}{|} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{DOUBLEBUF}\PYG{p}{)}
+    \PYG{n}{clock} \PYG{o}{=} \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{time}\PYG{o}{.}\PYG{n}{Clock}\PYG{p}{()}
+
+    \PYG{n}{data} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}throttle\PYGZsq{}}\PYG{p}{:} \PYG{p}{[],} \PYG{l+s+s1}{\PYGZsq{}brake\PYGZsq{}}\PYG{p}{:} \PYG{p}{[],} \PYG{l+s+s1}{\PYGZsq{}steer\PYGZsq{}}\PYG{p}{:} \PYG{p}{[],} \PYG{l+s+s1}{\PYGZsq{}junction\PYGZsq{}}\PYG{p}{:} \PYG{p}{[]\PYGZcb{}}
+    \PYG{k}{try}\PYG{p}{:}
+      \PYG{n}{client} \PYG{o}{=} \PYG{n}{carla}\PYG{o}{.}\PYG{n}{Client}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}localhost\PYGZsq{}}\PYG{p}{,} \PYG{l+m+mi}{2000}\PYG{p}{)}
+      \PYG{n}{client}\PYG{o}{.}\PYG{n}{set\PYGZus{}timeout}\PYG{p}{(}\PYG{l+m+mf}{2.0}\PYG{p}{)}
+
+      \PYG{n}{world} \PYG{o}{=} \PYG{n}{client}\PYG{o}{.}\PYG{n}{get\PYGZus{}world}\PYG{p}{()}
+      \PYG{n}{player} \PYG{o}{=} \PYG{n}{spawn\PYGZus{}player}\PYG{p}{(}\PYG{n}{world}\PYG{p}{)}
+      \PYG{n}{actor\PYGZus{}list}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{player}\PYG{p}{)}
+
+      \PYG{n}{weather\PYGZus{}index} \PYG{o}{=} \PYG{l+m+mi}{0}
+      \PYG{n}{weather\PYGZus{}presets} \PYG{o}{=} \PYG{n}{find\PYGZus{}weather\PYGZus{}presets}\PYG{p}{()}
+      \PYG{n}{preset} \PYG{o}{=} \PYG{n}{weather\PYGZus{}presets}\PYG{p}{[}\PYG{n}{weather\PYGZus{}index}\PYG{p}{]}
+      \PYG{n}{world}\PYG{o}{.}\PYG{n}{set\PYGZus{}weather}\PYG{p}{(}\PYG{n}{preset}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+
+      \PYG{n}{blueprint\PYGZus{}library} \PYG{o}{=} \PYG{n}{world}\PYG{o}{.}\PYG{n}{get\PYGZus{}blueprint\PYGZus{}library}\PYG{p}{()}
+
+      \PYG{n}{cam\PYGZus{}pos} \PYG{o}{=} \PYG{n}{carla}\PYG{o}{.}\PYG{n}{Transform}\PYG{p}{(}\PYG{n}{carla}\PYG{o}{.}\PYG{n}{Location}\PYG{p}{(}\PYG{n}{x}\PYG{o}{=}\PYG{l+m+mf}{1.6}\PYG{p}{,} \PYG{n}{z}\PYG{o}{=}\PYG{l+m+mf}{1.7}\PYG{p}{))}
+
+      \PYG{n}{camera\PYGZus{}rgb} \PYG{o}{=} \PYG{n}{create\PYGZus{}camera}\PYG{p}{(}\PYG{n}{cam\PYGZus{}type}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}rgb\PYGZsq{}}\PYG{p}{,}
+                   \PYG{n}{vehicle}\PYG{o}{=}\PYG{n}{player}\PYG{p}{,}
+                   \PYG{n}{pos}\PYG{o}{=}\PYG{n}{cam\PYGZus{}pos}\PYG{p}{,}
+                   \PYG{n}{h}\PYG{o}{=}\PYG{n}{h}\PYG{p}{,} \PYG{n}{w}\PYG{o}{=}\PYG{n}{w}\PYG{p}{,}
+                   \PYG{n}{lib}\PYG{o}{=}\PYG{n}{blueprint\PYGZus{}library}\PYG{p}{,}
+                   \PYG{n}{world}\PYG{o}{=}\PYG{n}{world}\PYG{p}{)}
+      \PYG{n}{actor\PYGZus{}list}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{camera\PYGZus{}rgb}\PYG{p}{)}
+
+      \PYG{n}{camera\PYGZus{}semseg} \PYG{o}{=} \PYG{n}{create\PYGZus{}camera}\PYG{p}{(}\PYG{n}{cam\PYGZus{}type}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}semantic\PYGZus{}segmentation\PYGZsq{}}\PYG{p}{,} 
+                                    \PYG{n}{vehicle}\PYG{o}{=}\PYG{n}{vehicle}\PYG{p}{,} 
+                                    \PYG{n}{pos}\PYG{o}{=}\PYG{n}{cam\PYGZus{}pos}\PYG{p}{,} 
+                                    \PYG{n}{h}\PYG{o}{=}\PYG{n}{h}\PYG{p}{,} \PYG{n}{w}\PYG{o}{=}\PYG{n}{w}\PYG{p}{,}
+                                    \PYG{n}{lib}\PYG{o}{=}\PYG{n}{blueprint\PYGZus{}library}\PYG{p}{,} 
+                                    \PYG{n}{world}\PYG{o}{=}\PYG{n}{world}\PYG{p}{)}
+      \PYG{n}{actor\PYGZus{}list}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{camera\PYGZus{}semseg}\PYG{p}{)}
+
+      \PYG{n}{camera\PYGZus{}depth} \PYG{o}{=} \PYG{n}{create\PYGZus{}camera}\PYG{p}{(}\PYG{n}{cam\PYGZus{}type}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}depth\PYGZsq{}}\PYG{p}{,} 
+                                   \PYG{n}{vehicle}\PYG{o}{=}\PYG{n}{vehicle}\PYG{p}{,} 
+                                   \PYG{n}{pos}\PYG{o}{=}\PYG{n}{cam\PYGZus{}pos}\PYG{p}{,} 
+                                   \PYG{n}{h}\PYG{o}{=}\PYG{n}{h}\PYG{p}{,} \PYG{n}{w}\PYG{o}{=}\PYG{n}{w}\PYG{p}{,}
+                                   \PYG{n}{lib}\PYG{o}{=}\PYG{n}{blueprint\PYGZus{}library}\PYG{p}{,} 
+                                   \PYG{n}{world}\PYG{o}{=}\PYG{n}{world}\PYG{p}{)}
+      \PYG{n}{actor\PYGZus{}list}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{camera\PYGZus{}depth}\PYG{p}{)}
+
+      \PYG{c+c1}{\PYGZsh{} Ceder el control del vahículo al Traffic Manager}
+      \PYG{n}{player}\PYG{o}{.}\PYG{n}{set\PYGZus{}autopilot}\PYG{p}{(}\PYG{n+nb+bp}{True}\PYG{p}{)}
+
+      \PYG{k}{with} \PYG{n}{CarlaSyncMode}\PYG{p}{(}\PYG{n}{world}\PYG{p}{,} \PYG{n}{camera\PYGZus{}rgb}\PYG{p}{,} \PYG{n}{camera\PYGZus{}semseg}\PYG{p}{,} \PYG{n}{camera\PYGZus{}depth}\PYG{p}{,} 
+                         \PYG{n}{fps}\PYG{o}{=}\PYG{l+m+mi}{20}\PYG{p}{)} \PYG{k}{as} \PYG{n}{sync\PYGZus{}mode}\PYG{p}{:}
+        \PYG{n}{frame} \PYG{o}{=} \PYG{l+m+mi}{0}
+        \PYG{k}{while} \PYG{n+nb+bp}{True}\PYG{p}{:}
+          \PYG{k}{if} \PYG{n}{should\PYGZus{}quit}\PYG{p}{():}
+            \PYG{k}{return}
+          \PYG{n}{clock}\PYG{o}{.}\PYG{n}{tick}\PYG{p}{()}
+
+          \PYG{c+c1}{\PYGZsh{} Obtener los fotogramas síncronos de las cámaras}
+          \PYG{n}{snapshot}\PYG{p}{,} \PYG{n}{image\PYGZus{}rgb}\PYG{p}{,} \PYG{n}{image\PYGZus{}semseg}\PYG{p}{,} \PYG{n}{image\PYGZus{}depth} \PYG{o}{=} \PYG{n}{sync\PYGZus{}mode}\PYG{o}{.}\PYG{n}{tick}\PYG{p}{(}\PYG{n}{timeout}\PYG{o}{=}\PYG{l+m+mf}{2.0}\PYG{p}{)}
+
+          \PYG{c+c1}{\PYGZsh{} Convertir la imagen a un 2D array}
+          \PYG{n}{rgb\PYGZus{}arr} \PYG{o}{=} \PYG{n}{img\PYGZus{}to\PYGZus{}array}\PYG{p}{(}\PYG{n}{image\PYGZus{}rgb}\PYG{p}{)}
+          \PYG{c+c1}{\PYGZsh{} Visualizar la cámara RGB}
+          \PYG{n}{show\PYGZus{}window}\PYG{p}{(}\PYG{n}{display}\PYG{p}{,} \PYG{n}{rgb\PYGZus{}arr}\PYG{p}{)}
+          \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{display}\PYG{o}{.}\PYG{n}{flip}\PYG{p}{()}
+
+          \PYG{n}{c} \PYG{o}{=} \PYG{n}{player}\PYG{o}{.}\PYG{n}{get\PYGZus{}control}\PYG{p}{()}
+
+          \PYG{k}{if} \PYG{n}{c}\PYG{o}{.}\PYG{n}{throttle} \PYG{o}{!=} \PYG{l+m+mi}{0}\PYG{p}{:}
+            \PYG{n}{location} \PYG{o}{=} \PYG{n}{player}\PYG{o}{.}\PYG{n}{get\PYGZus{}location}\PYG{p}{()}
+            \PYG{n}{wp} \PYG{o}{=} \PYG{n}{world}\PYG{o}{.}\PYG{n}{get\PYGZus{}map}\PYG{p}{()}\PYG{o}{.}\PYG{n}{get\PYGZus{}waypoint}\PYG{p}{(}\PYG{n}{location}\PYG{p}{)}
+
+            \PYG{c+c1}{\PYGZsh{} Convetir las otras cámaras en arreglos BGR}
+            \PYG{n}{depth\PYGZus{}arr} \PYG{o}{=} \PYG{n}{img\PYGZus{}to\PYGZus{}array}\PYG{p}{(}\PYG{n}{image\PYGZus{}depth}\PYG{p}{)}
+            \PYG{n}{mask\PYGZus{}arr} \PYG{o}{=} \PYG{n}{img\PYGZus{}to\PYGZus{}array}\PYG{p}{(}\PYG{n}{image\PYGZus{}semseg}\PYG{p}{)}
+
+            \PYG{c+c1}{\PYGZsh{} Guardar las imagenes como archivos}
+            \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{imwrite}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}base\PYGZus{}path\PYGZcb{}/Images/\PYGZob{}n\PYGZus{}sim\PYGZcb{}/rgb/\PYGZob{}frame\PYGZcb{}.png\PYGZsq{}}\PYG{p}{,} \PYG{n}{rgb\PYGZus{}arr}\PYG{p}{)}
+            \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{imwrite}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}base\PYGZus{}path\PYGZcb{}/Images/\PYGZob{}n\PYGZus{}sim\PYGZcb{}/mask/\PYGZob{}frame\PYGZcb{}.png\PYGZsq{}}\PYG{p}{,} \PYG{n}{mask\PYGZus{}arr}\PYG{p}{)}
+
+            \PYG{c+c1}{\PYGZsh{} Crear una entrada de datos en el diccionario}
+            \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}throttle\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{c}\PYG{o}{.}\PYG{n}{throttle}\PYG{p}{,} \PYG{l+m+mf}{0.4}\PYG{p}{))}
+            \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}brake\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{c}\PYG{o}{.}\PYG{n}{brake}\PYG{p}{)}
+            \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}steer\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{c}\PYG{o}{.}\PYG{n}{steer}\PYG{p}{)}
+            \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}junction\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{wp}\PYG{o}{.}\PYG{n}{is\PYGZus{}junction}\PYG{p}{)}
+
+            \PYG{n}{frame} \PYG{o}{+=} \PYG{l+m+mi}{1}
+
+            \PYG{k}{if} \PYG{n}{frame} \PYG{o}{==} \PYG{l+m+mi}{8000}\PYG{p}{:}
+              \PYG{c+c1}{\PYGZsh{} Si se llega a los 8000 fotogramas, terminar simulacion}
+              \PYG{k}{return}
+            \PYG{k}{if} \PYG{n}{frame} \PYG{o}{\PYGZpc{}} \PYG{l+m+mi}{1000} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{:}
+              \PYG{k}{print}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}Frame: \PYGZob{}frame\PYGZcb{}\PYGZsq{}}\PYG{p}{)}
+    \PYG{k}{finally}\PYG{p}{:}
+      \PYG{k}{print}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}destroying actors.\PYGZsq{}}\PYG{p}{)}
+      \PYG{k}{for} \PYG{n}{actor} \PYG{o+ow}{in} \PYG{n}{actor\PYGZus{}list}\PYG{p}{:}
+          \PYG{n}{actor}\PYG{o}{.}\PYG{n}{destroy}\PYG{p}{()}
+      \PYG{n}{world}\PYG{o}{.}\PYG{n}{destroy}\PYG{p}{()}
+      \PYG{n}{pygame}\PYG{o}{.}\PYG{n}{quit}\PYG{p}{()}
+
+      \PYG{c+c1}{\PYGZsh{} Convertir el diccionario en un dataframe}
+      \PYG{n}{df} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{o}{.}\PYG{n}{from\PYGZus{}dict}\PYG{p}{(}\PYG{n}{data}\PYG{p}{)}
+      \PYG{c+c1}{\PYGZsh{} Exportar el dataframe como csv para la simulación}
+      \PYG{n}{df}\PYG{o}{.}\PYG{n}{to\PYGZus{}csv}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}base\PYGZus{}path\PYGZcb{}/Dfs/\PYGZob{}n\PYGZus{}sim\PYGZcb{}.csv\PYGZsq{}}\PYG{p}{,} \PYG{n}{index}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{)}
+      \PYG{k}{print}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}done.\PYGZsq{}}\PYG{p}{)}
+
+  \PYG{k}{except} \PYG{n+ne}{KeyboardInterrupt}\PYG{p}{:}
+    \PYG{k}{print}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s1}{Fin\PYGZsq{}}\PYG{p}{)}
+\end{Verbatim}

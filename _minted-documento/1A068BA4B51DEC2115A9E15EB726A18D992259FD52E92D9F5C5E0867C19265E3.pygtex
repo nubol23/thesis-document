@@ -1,0 +1,29 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{data} \PYG{o}{=} \PYG{n}{defaultdict}\PYG{p}{(}\PYG{n+nb}{list}\PYG{p}{)}
+\PYG{k}{for} \PYG{n}{junc} \PYG{o+ow}{in} \PYG{n}{juncs}\PYG{p}{:} \PYG{c+c1}{\PYGZsh{} Iterando por las carpetas}
+    \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}folder\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{junc}\PYG{p}{))}
+    \PYG{c+c1}{\PYGZsh{} Lectura de imagenes}
+    \PYG{n}{files} \PYG{o}{=} \PYG{n+nb}{sorted}\PYG{p}{(}\PYG{n}{os}\PYG{o}{.}\PYG{n}{listdir}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}junctions/\PYGZob{}junc\PYGZcb{}\PYGZsq{}}\PYG{p}{),}
+                   \PYG{n}{key}\PYG{o}{=}\PYG{k}{lambda} \PYG{n}{x}\PYG{p}{:} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{x}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}.\PYGZsq{}}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{split}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}\PYGZus{}\PYGZsq{}}\PYG{p}{)[}\PYG{l+m+mi}{1}\PYG{p}{]))}
+    \PYG{k}{for} \PYG{n+nb}{file} \PYG{o+ow}{in} \PYG{n}{files}\PYG{p}{:} \PYG{c+c1}{\PYGZsh{} Visualización}
+        \PYG{n}{img} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{imread}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}junctions/\PYGZob{}junc\PYGZcb{}/\PYGZob{}file\PYGZcb{}\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{imshow}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}window\PYGZsq{}}\PYG{p}{,} \PYG{n}{img}\PYG{p}{)}
+        \PYG{n}{sleep}\PYG{p}{(}\PYG{l+m+mf}{0.01}\PYG{p}{)}
+        \PYG{k}{if} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{waitKey}\PYG{p}{(}\PYG{l+m+mi}{25}\PYG{p}{)} \PYG{o}{\PYGZam{}} \PYG{l+m+mh}{0xFF} \PYG{o}{==} \PYG{n+nb}{ord}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}q\PYGZsq{}}\PYG{p}{):}
+            \PYG{k}{break}
+    \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{destroyAllWindows}\PYG{p}{()}
+
+    \PYG{k}{print}\PYG{p}{(}\PYG{n}{f}\PYG{l+s+s1}{\PYGZsq{}junc: \PYGZob{}junc\PYGZcb{}\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{junc\PYGZus{}desc} \PYG{o}{=} \PYG{n+nb}{input}\PYG{p}{()} \PYG{c+c1}{\PYGZsh{} Registro de etiquetas}
+    \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}path\PYGZus{}left\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+m+mi}{1} \PYG{k}{if} \PYG{l+s+s1}{\PYGZsq{}a\PYGZsq{}} \PYG{o+ow}{in} \PYG{n}{junc\PYGZus{}desc} \PYG{k}{else} \PYG{l+m+mi}{0}\PYG{p}{)}
+    \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}path\PYGZus{}right\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+m+mi}{1} \PYG{k}{if} \PYG{l+s+s1}{\PYGZsq{}d\PYGZsq{}} \PYG{o+ow}{in} \PYG{n}{junc\PYGZus{}desc} \PYG{k}{else} \PYG{l+m+mi}{0}\PYG{p}{)}
+    \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}path\PYGZus{}forward\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+m+mi}{1} \PYG{k}{if} \PYG{l+s+s1}{\PYGZsq{}w\PYGZsq{}} \PYG{o+ow}{in} \PYG{n}{junc\PYGZus{}desc} \PYG{k}{else} \PYG{l+m+mi}{0}\PYG{p}{)}
+
+    \PYG{n}{junc\PYGZus{}action} \PYG{o}{=} \PYG{n+nb}{input}\PYG{p}{()}
+    \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}action\PYGZus{}left\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+m+mi}{1} \PYG{k}{if} \PYG{l+s+s1}{\PYGZsq{}a\PYGZsq{}} \PYG{o+ow}{in} \PYG{n}{junc\PYGZus{}action} \PYG{k}{else} \PYG{l+m+mi}{0}\PYG{p}{)}
+    \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}action\PYGZus{}right\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+m+mi}{1} \PYG{k}{if} \PYG{l+s+s1}{\PYGZsq{}d\PYGZsq{}} \PYG{o+ow}{in} \PYG{n}{junc\PYGZus{}action} \PYG{k}{else} \PYG{l+m+mi}{0}\PYG{p}{)}
+    \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}action\PYGZus{}forward\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{l+m+mi}{1} \PYG{k}{if} \PYG{l+s+s1}{\PYGZsq{}w\PYGZsq{}} \PYG{o+ow}{in} \PYG{n}{junc\PYGZus{}action} \PYG{k}{else} \PYG{l+m+mi}{0}\PYG{p}{)}
+
+\PYG{n}{df} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{o}{.}\PYG{n}{from\PYGZus{}dict}\PYG{p}{(}\PYG{n}{data}\PYG{p}{)}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{to\PYGZus{}csv}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}juncs\PYGZus{}final.csv\PYGZsq{}}\PYG{p}{,} \PYG{n}{index}\PYG{o}{=}\PYG{n+nb+bp}{False}\PYG{p}{)}
+\end{Verbatim}

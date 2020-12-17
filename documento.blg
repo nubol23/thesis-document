@@ -1,0 +1,29 @@
+[0] Config.pm:302> INFO - This is Biber 2.9
+[0] Config.pm:305> INFO - Logfile is 'documento.blg'
+[18] biber:313> INFO - === vie dic 11, 2020, 02:18:43
+[33] Biber.pm:371> INFO - Reading 'documento.bcf'
+[78] Biber.pm:857> INFO - Found 41 citekeys in bib section 0
+[87] Biber.pm:3981> INFO - Processing section 0
+[96] Biber.pm:4154> INFO - Looking for bibtex format file 'capitulos/biblio.bib' for section 0
+[97] bibtex.pm:1468> INFO - LaTeX decoding ...
+[136] bibtex.pm:1294> INFO - Found BibTeX data source 'capitulos/biblio.bib'
+[150] Utils.pm:169> WARN - month field 'Oct' in entry 'Rumelhart_Hinton_Williams_1986' is not an integer - this will probably not sort properly.
+[201] Utils.pm:169> WARN - year field '[2017] 2020' in entry 'retinanet' is not an integer - this will probably not sort properly.
+[224] Utils.pm:169> WARN - month field 'Jun' in entry 'hooper_2004' is not an integer - this will probably not sort properly.
+[226] Utils.pm:169> WARN - month field 'Oct' in entry 'markoff_2010' is not an integer - this will probably not sort properly.
+[228] Utils.pm:169> WARN - month field 'Oct' in entry 'nelson_2015' is not an integer - this will probably not sort properly.
+[231] Utils.pm:169> WARN - month field 'May' in entry 'granath_2020' is not an integer - this will probably not sort properly.
+[231] Utils.pm:169> WARN - month field 'Jul' in entry 'wikipedia_2020' is not an integer - this will probably not sort properly.
+[245] Utils.pm:169> WARN - month field 'jun' in entry 'J3016_201806' is not an integer - this will probably not sort properly.
+[256] Utils.pm:169> WARN - month field 'Dec' in entry 'montabone_2012' is not an integer - this will probably not sort properly.
+[299] Utils.pm:169> WARN - year field '{2019}' in entry 'icra_2019_fastdepth' is not an integer - this will probably not sort properly.
+[310] Utils.pm:169> WARN - month field 'June' in entry 'Wang_2020_CVPR_Workshops' is not an integer - this will probably not sort properly.
+[314] Utils.pm:169> WARN - BibTeX subsystem: /tmp/V7UP5RCbxv/biblio.bib_5871.utf8, line 184, warning: 3 characters of junk seen at toplevel
+[314] Utils.pm:169> WARN - BibTeX subsystem: /tmp/V7UP5RCbxv/biblio.bib_5871.utf8, line 322, warning: 1 characters of junk seen at toplevel
+[314] Utils.pm:169> WARN - BibTeX subsystem: /tmp/V7UP5RCbxv/biblio.bib_5871.utf8, line 332, warning: 1 characters of junk seen at toplevel
+[364] UCollate.pm:68> INFO - Overriding locale 'es-ES' defaults 'variable = shifted' with 'variable = non-ignorable'
+[364] UCollate.pm:68> INFO - Overriding locale 'es-ES' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[364] Biber.pm:3809> INFO - Sorting list 'apa/global//global/global' of type 'entry' with template 'apa' and locale 'es-ES'
+[395] bbl.pm:617> INFO - Writing 'documento.bbl' with encoding 'UTF-8'
+[420] bbl.pm:720> INFO - Output to documento.bbl
+[420] Biber.pm:110> INFO - WARNINGS: 14

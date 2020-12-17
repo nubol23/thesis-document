@@ -1,0 +1,136 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\babel@toc {spanish}{}
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {1}{\ignorespaces Contornos de objetos}}{2}{figure.caption.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {2}{\ignorespaces Caracter\IeC {\'\i }sticas HAAR}}{3}{figure.caption.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3}{\ignorespaces Vectores direccionales del HOG}}{3}{figure.caption.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {4}{\ignorespaces Flujo predicci\IeC {\'o}n YOLO}}{4}{figure.caption.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5}{\ignorespaces Partici\IeC {\'o}n y recuadros de detecci\IeC {\'o}n SSD}}{4}{figure.caption.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {6}{\ignorespaces Segmentaci\IeC {\'o}n de carretera por MCRF}}{5}{figure.caption.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {im\IeC {\'a}gen original}}}{5}{subfigure.6.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {segmentaci\IeC {\'o}n con MCRF}}}{5}{subfigure.6.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {7}{\ignorespaces Segmentaci\IeC {\'o}n de una c\IeC {\'e}lula del dataset PhC-U373}}{6}{figure.caption.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {im\IeC {\'a}gen original}}}{6}{subfigure.7.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {segmentaci\IeC {\'o}n con U-Net}}}{6}{subfigure.7.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {8}{\ignorespaces Segmentaci\IeC {\'o}n sem\IeC {\'a}ntica de distintas clases}}{6}{figure.caption.8}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {9}{\ignorespaces DAVE}}{7}{figure.caption.9}
+\defcounter {refsection}{0}\relax 
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Veh\IeC {\'\i }culo DAVE}}}{7}{subfigure.9.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Predicci\IeC {\'o}n del \IeC {\'a}ngulo de rotaci\IeC {\'o}n}}}{7}{subfigure.9.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {10}{\ignorespaces Diagrama CRISP-DM}}{14}{figure.caption.10}
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {11}{\ignorespaces Intensidad de los canales de color RGB}}{17}{figure.caption.11}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {12}{\ignorespaces Convoluci\IeC {\'o}n del filtro $K$ con la imagen $I$}}{18}{figure.caption.12}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {13}{\ignorespaces Dilataci\IeC {\'o}n sobre un conjunto de letras con discontinuidades}}{19}{figure.caption.13}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {14}{\ignorespaces Erosi\IeC {\'o}n de una letra}}{20}{figure.caption.14}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {15}{\ignorespaces Apertura aplicada a una huella digital}}{20}{figure.caption.15}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {16}{\ignorespaces Ajuste iterativo de k-means}}{22}{figure.caption.16}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {17}{\ignorespaces Ajuste de regresi\IeC {\'o}n lineal}}{26}{figure.caption.17}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {18}{\ignorespaces Ajuste de regresi\IeC {\'o}n log\IeC {\'\i }stica}}{28}{figure.caption.18}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {19}{\ignorespaces Pasos de los par\IeC {\'a}metros $W$ en cada iteraci\IeC {\'o}n camino al m\IeC {\'\i }nimo error}}{29}{figure.caption.19}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {20}{\ignorespaces Red neuronal con una capa oculta}}{32}{figure.caption.20}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {21}{\ignorespaces Red neuronal convolucional para la clasificaci\IeC {\'o}n de d\IeC {\'\i }gitos manuscritos}}{34}{figure.caption.21}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {22}{\ignorespaces Convoluci\IeC {\'o}n con $s=2$}}{35}{figure.caption.22}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {23}{\ignorespaces Pooling con con $s=1$}}{35}{figure.caption.23}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {24}{\ignorespaces Cuello de botella residual}}{36}{figure.caption.24}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {25}{\ignorespaces Arquitectura FastDepth}}{38}{figure.caption.25}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {26}{\ignorespaces Extracci\IeC {\'o}n de las caracter\IeC {\'\i }sticas profundas aprendidas}}{39}{figure.caption.26}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {27}{\ignorespaces Algoritmo ScoreCam}}{39}{figure.caption.27}
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {28}{\ignorespaces Arquitectura del proyecto}}{43}{figure.caption.28}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {29}{\ignorespaces Diagrama de secuencia de extracci\IeC {\'o}n de datos}}{44}{figure.caption.29}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {30}{\ignorespaces Etiquetas de profundidad imagen}}{45}{figure.caption.30}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {31}{\ignorespaces Segmentaci\IeC {\'o}n sem\IeC {\'a}ntica con c\IeC {\'o}digos de color}}{46}{figure.caption.31}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {32}{\ignorespaces Etapas del etiquetado de intersecciones}}{48}{figure.caption.32}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {33}{\ignorespaces Entrenamiento de tres redes neuronales}}{49}{figure.caption.33}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {34}{\ignorespaces Arquitectura DriveNet basada en Mobilenet V2}}{50}{figure.caption.34}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {35}{\ignorespaces Arquitectura FastDepth\relax }}{51}{figure.caption.35}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {36}{\ignorespaces SemsegNet, FastDepth para clasificaci\IeC {\'o}n 2D\relax }}{52}{figure.caption.36}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {37}{\ignorespaces Aplicaci\IeC {\'o}n de medias exponenciales m\IeC {\'o}viles}}{52}{figure.caption.37}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {38}{\ignorespaces Cuantificaci\IeC {\'o}n digital del color}}{54}{figure.caption.38}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {39}{\ignorespaces Delimitado del \IeC {\'a}rea de inter\IeC {\'e}s para la detecci\IeC {\'o}n de objetos}}{55}{figure.caption.39}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {40}{\ignorespaces Modelo de conducci\IeC {\'o}n aut\IeC {\'o}noma}}{56}{figure.caption.40}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {41}{\ignorespaces Errores de entrenamiento y validaci\IeC {\'o}n de la DriveNet}}{57}{figure.caption.41}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {42}{\ignorespaces Errores de entrenamiento y validaci\IeC {\'o}n de la DepthNet}}{57}{figure.caption.42}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {43}{\ignorespaces Errores de entrenamiento y validaci\IeC {\'o}n de la SemsegNet}}{58}{figure.caption.43}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {44}{\ignorespaces Espacios de color y centroides para dos sem\IeC {\'a}foros distintos}}{59}{figure.caption.44}
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {45}{\ignorespaces Predicci\IeC {\'o}n Media M\IeC {\'o}vil Exponencial}}{61}{figure.caption.45}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {46}{\ignorespaces Predicci\IeC {\'o}n vs valor esperado de profundidad}}{62}{figure.caption.46}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {47}{\ignorespaces Matriz de confusi\IeC {\'o}n de segmentaci\IeC {\'o}n sem\IeC {\'a}ntica}}{63}{figure.caption.47}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {48}{\ignorespaces Predicci\IeC {\'o}n vs valor esperado de segmentaci\IeC {\'o}n}}{65}{figure.caption.48}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {49}{\ignorespaces Cajas delimitadoras}}{66}{figure.caption.49}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {50}{\ignorespaces Cuantizaci\IeC {\'o}n y Clasificaci\IeC {\'o}n del Color}}{68}{figure.caption.50}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {51}{\ignorespaces Distancia a de objetos}}{69}{figure.caption.51}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {52}{\ignorespaces Regiones de Inter\IeC {\'e}s en la Inferencia de Direcci\IeC {\'o}n}}{70}{figure.caption.52}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {53}{\ignorespaces Comparaci\IeC {\'o}n de Direcci\IeC {\'o}n Real y Estimada}}{71}{figure.caption.53}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {54}{\ignorespaces Charco erroneamente Clasificado}}{72}{figure.caption.54}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {55}{\ignorespaces Colisi\IeC {\'o}n con Poste}}{73}{figure.caption.56}
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
