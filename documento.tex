@@ -19,6 +19,7 @@
 \usepackage{float}
 \usepackage{booktabs}
 \usepackage{setspace} %por si el titulo es mas largo y el interlineado
+\usepackage{pdfpages}
 
 \usepackage[colorlinks=true, linkcolor=black,
 citecolor=black, urlcolor=black,hidelinks]{hyperref}
@@ -135,28 +136,36 @@ citecolor=black, urlcolor=black,hidelinks]{hyperref}
 \usemintedstyle{tango}
 
 \renewcommand{\cftbeforetoctitleskip}{-0.25in}
-\renewcommand{\cfttoctitlefont}{\large\bfseries}
+\renewcommand{\cfttoctitlefont}{\hspace{6.5cm}\large\bfseries}
 \renewcommand{\cftaftertoctitleskip}{0.0\baselineskip}
 
 %\renewcommand{\cftbeforeloftitleskip}{-1mm}
 \renewcommand{\cftbeforeloftitleskip}{-0.25in}
-\renewcommand{\cftloftitlefont}{\large\bfseries}
+\renewcommand{\cftloftitlefont}{\hspace{6.3cm}\large\bfseries}
 \renewcommand{\cftafterloftitleskip}{0.0\baselineskip}
 
 %\renewcommand{\cftbeforelottitleskip}{-0.01in}
 \renewcommand{\cftbeforelottitleskip}{-0.25in}
-\renewcommand{\cftlottitlefont}{\large\bfseries}
+\renewcommand{\cftlottitlefont}{\hspace{6.3cm}\large\bfseries}
 \renewcommand{\cftafterlottitleskip}{0.0\baselineskip}
 
 \begin{document}
-	\frontmatter %numeros romanos
+	\frontmatter % numeros romanos
 	\include{caratula}
+	\includepdf[page={2}]{T-3395}
+%	\include{licencia}
+
+	\setcounter{page}{3}
+	\include{agradecimiento}
 	
 	\tableofcontents
+	\addcontentsline{toc}{section}{ÍNDICE}
 	\newpage
 	\listoffigures
+	\addcontentsline{toc}{section}{ÍNDICE DE FIGURAS}
 	\newpage
 	\listoftables
+	\addcontentsline{toc}{section}{ÍNDICE DE TABLAS}
 	
 	% Elimina página en blanco luego de la lista de tablas
 	\let\cleardoublepage\clearpage

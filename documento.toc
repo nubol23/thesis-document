@@ -1,6 +1,20 @@
 \boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
 \babel@toc {spanish}{}
 \defcounter {refsection}{0}\relax 
+\contentsline {section}{DEDICATORIA}{\es@scroman {iii}}{Doc-Start}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{AGRADECIMIENTOS}{\es@scroman {iv}}{Doc-Start}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{RESUMEN}{\es@scroman {v}}{Doc-Start}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{ABSTRACT}{\es@scroman {vi}}{Doc-Start}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\IeC {\'I}NDICE}{\es@scroman {xi}}{Doc-Start}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\IeC {\'I}NDICE DE FIGURAS}{\es@scroman {xiii}}{Doc-Start}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\IeC {\'I}NDICE DE TABLAS}{\es@scroman {xiv}}{Doc-Start}
+\defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {1}MARCO REFERENCIAL}{1}{chapter.1}
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {1.1}INTRODUCCI\IeC {\'O}N}{1}{section.1.1}
