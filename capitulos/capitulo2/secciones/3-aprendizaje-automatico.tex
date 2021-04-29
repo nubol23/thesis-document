@@ -10,7 +10,7 @@
         
         \noindent con $\mathbf{X}$ el conjunto de observaciones y $\mathbf{Y}$ las etiquetas o valores a predecir. La distribución de los datos es desconocida, por lo que se considera a $\mathcal{D}$ como una muestra aleatoria de tamaño $m$ proveniente de esta distribución.
         
-        Con el fin de poder modelar estos datos y aproximarnos a la distribución original para poder realizar inferencias, definimos una función predictiva
+        Con el fin de poder modelar estos datos y aproximarse a la distribución original para poder realizar inferencias, se define una función predictiva
         
         $$f: \mathbf{X} \mapsto \mathbf{\hat{Y}}$$
         
@@ -18,13 +18,13 @@
         
         $$\hat{y}_i = E(y_i|x_i) = f(x_i)$$
         
-        La tarea de aprender consiste en elegir la mejor función $f^* \in \mathcal{H}$, que minimice la esperanza de una función de pérdida $\mathcal{L}(\hat{y}_i, y_i)$. Esta función es una métrica definida en $\mathbb{R}$ que nos permite medir cuán lejos está nuestra predicción $\hat{y}_i$ de un valor esperado conocido $y_i$.
+        La tarea de aprender consiste en elegir la mejor función $f^* \in \mathcal{H}$, que minimice la esperanza de una función de pérdida $\mathcal{L}(\hat{y}_i, y_i)$. Esta función es una métrica definida en $\mathbb{R}$ que permite medir cuán lejos está nuestra predicción $\hat{y}_i$ de un valor esperado conocido $y_i$.
         
         Para obtener la función objetivo se minimiza el riesgo:
         
         \begin{equation}
         \begin{aligned}
-            f^* &= \underset{f \in \mathcal{H}}{\text{argmin}} \text{ } E\left[\mathcal{L}(f(\mathbf{X}), \mathbf{Y})\right]\\
+            f^* &= \underset{f \in \mathcal{H}}{\text{argmin}} \text{ } E\left[\mathcal{L}(f(\mathbf{X}), \mathbf{Y})\right]\\[1.4em]
             &= \int_\mathbf{X} \mathcal{L}(f(x_i), y_i)dP(\mathbf{X}, \mathbf{Y})
         \end{aligned}
         \end{equation}
@@ -56,7 +56,13 @@
             \mathbf{y} = \mathbf{X}\cdot\mathbf{\theta} + \mathbf{\varepsilon}\label{eq:3}
         \end{equation}
         
-        \noindent con
+        \noindent con los parámetros
+        
+        $$\theta = \begin{bmatrix}
+        	\theta_0 & \theta_1 & \dots & \theta_n
+        \end{bmatrix}$$
+    
+    	\noindent y con
         
         $$\mathbf{X} = \begin{bmatrix}
                         1 & x_{11} & x_{12} & \dots & x_{1n}\\
@@ -65,14 +71,14 @@
                         1 & x_{m1} & x_{m2} & \dots & x_{mn}\\
                         \end{bmatrix}$$
         
-        \noindent y los parámetros
+%        \noindent y los parámetros
         
-        $$\theta = \begin{bmatrix}
-                    \theta_0\\
-                    \theta_1\\
-                    \vdots\\
-                    \theta_n
-                    \end{bmatrix}$$
+%        $$\theta = \begin{bmatrix}
+%                    \theta_0\\
+%                    \theta_1\\
+%                    \vdots\\
+%                    \theta_n
+%                    \end{bmatrix}$$
                     
         \noindent con función predictora
         
@@ -80,7 +86,7 @@
             \mathbf{\hat{Y}} = f(\mathbf{X}) = \mathbf{X}\cdot\mathbf{\theta}
         \end{equation}
         
-        Los parámetros $\theta$ que nos permiten encontrar la función $\hat{f}$ se estiman mediante el método de mínimos cuadrados con función de pérdida $\mathcal{L} =  (\mathrm{y}_i - \mathrm{\hat{y}}_i)^2$, y función de costo
+        Los parámetros $\theta$ que permiten encontrar la función $\hat{f}$ se estiman mediante el método de mínimos cuadrados con función de pérdida $\mathcal{L} =  (\mathrm{y}_i - \mathrm{\hat{y}}_i)^2$, y función de costo
         
         \begin{equation}
             E(\theta) = \frac{1}{m} (\mathrm{y}_i - \mathrm{\hat{y}}_i)^2 = \frac{1}{m} (\mathbf{y} - \mathbf{\hat{y}})^\prime\cdot (\mathbf{y} - \mathbf{\hat{y}})
@@ -98,8 +104,8 @@
         
         \begin{figure}[H]
             \centering
-             \includegraphics[scale=0.6]{imagenes/linear_fit}
-%            \includegraphics[scale=0.55]{imagenes/linear_fit}
+%             \includegraphics[scale=0.6]{imagenes/linear_fit}
+            \includegraphics[scale=0.45]{imagenes/linear_fit}
             \caption[Ajuste de regresión lineal]{Ajuste de una regresión lineal a un conjunto de datos de precios de casas\\ Fuente: Elaboración propia}
         \end{figure}
     	
@@ -144,7 +150,8 @@
         
         \begin{figure}[H]
             \centering
-            \includegraphics[scale=0.42]{imagenes/logistic_reg}
+            \includegraphics[scale=0.35]{imagenes/logistic_reg}
+%			\includegraphics[scale=0.47]{imagenes/logistic_reg}
             \caption[Ajuste de regresión logística]{Ajuste de una regresión logística a un conjunto de datos con 2 clases\\ Fuente: Elaboración propia}
         \end{figure}
         % \vspace{-8mm}
@@ -172,7 +179,8 @@
         
         \begin{figure}[H]
             \centering
-            \includegraphics[scale=0.38]{imagenes/sgd}
+%            \includegraphics[scale=0.38]{imagenes/sgd}
+			\includegraphics[scale=0.32]{imagenes/sgd}
             \caption[Pasos de los parámetros $W$ en cada iteración camino al mínimo error]{Pasos de los parámetros $W$ en cada iteración camino al mínimo error\\ Fuente: \citep{10.5555/3360093}}
         \end{figure}
       

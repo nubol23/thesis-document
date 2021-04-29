@@ -43,7 +43,7 @@ Así se seleccionan los parámetros de las iteraciones o epochs con menor error 
 
 	La consecuencia de esto se nota mayormente al encontrarse con objetos cercanos, donde se puede predecir erróneamente que está muy cerca, en cuyo caso el vehículo se detiene totalmente ante un falso obstáculo, o el caso más peligroso que se da cuando el objeto está muy cerca y se predice que está una unidad más lejos del límite en el cual el modelo decide detener el auto y se produce una colisión.
 	
-	Gráficamente en la figura \ref{depthpred} se observa que la predicción es ``borrosa'' comparado con el mapa de profundidad original
+	Gráficamente en la figura \ref{depthpred} se observa que la predicción es ``borrosa'' comparado con el mapa de profundidad original.
 	
 	\begin{figure}[H]
 		\centering
@@ -179,7 +179,8 @@ El módulo de segmentación semántica, considerando la limpieza de predicciones
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[scale=0.65]{imagenes/preds/semaforos}
+%		\includegraphics[scale=0.65]{imagenes/preds/semaforos}
+		\includegraphics[scale=0.58]{imagenes/preds/semaforos}
 		\caption[Cuantización y Clasificación del Color]{cuantización y clasificación del color}
 		\label{semaforos}
 	\end{figure}

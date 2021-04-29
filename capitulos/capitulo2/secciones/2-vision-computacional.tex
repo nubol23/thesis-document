@@ -41,7 +41,7 @@
     		
         
         \subsection{TRANSFORMACIONES MORFOLÓGICAS}
-        	En tareas de imágenes binarias, el tipo más común de operaciones o filtros aplicados son las transformaciones morfológicas, llamadas así ya que modifican la estructura de los objetos binarios en la imagen, consisten en filtros llamados elementos estructurantes, los cuales son una matriz binaria que contiene un patrón bajo el cual se realiza una comparación o conteo píxel a píxel con recortes de la imagen, similar a una convolución 2D \citep{szeliski}
+        	En tareas de imágenes binarias, el tipo más común de operaciones o filtros aplicados son las transformaciones morfológicas, llamadas así ya que modifican la estructura de los objetos binarios en la imagen, consisten en filtros llamados elementos estructurantes, los cuales son una matriz binaria que contiene un patrón bajo el cual se realiza una comparación o conteo píxel a píxel con recortes de la imagen, similar a una convolución 2D. \citep{szeliski}
 			\subsubsection{DILATACIÓN}
 				Es la operación que consiste en dilatar los píxeles, cuenta cuántos píxeles en el recorte de la imagen que estén en la misma coordenada que los unos del elemento estructurante son distintos de cero, si existe por lo menos un píxel que cumple esta condición entonces el píxel central de la ventana deslizante se le asignará el valor distinto de cero especificado.
 				
@@ -68,7 +68,8 @@
 				
 				\begin{figure}[H]
 					\centering
-					\includegraphics[scale=0.6]{imagenes/apertura}
+%					\includegraphics[scale=0.6]{imagenes/apertura}
+					\includegraphics[scale=0.4]{imagenes/apertura}
 					\caption[Apertura aplicada a una huella digital]{apertura aplicada a una huella digital para eliminar artefactos\\Fuente: \citep{gonzalez}}
 				\end{figure}
 				
@@ -78,7 +79,7 @@
         	
         	Debido a que se pretende que el algoritmo sea quien extraiga la información de los datos, la única entrada que se le provee es el número de clusters esperados, en base al cual se inicializan $k$ puntos aleatorios representando los centros de cada conglomerado. Al inicializarse aleatoriamente, se deben mejorar iterativamente las coordenadas de los centroides o medias denominados $\mu_i$.
         	
-        	Se define una matriz binaria $R$ de dimensiones $m\times k$ dónde $m$ es el número de observaciones, esta matriz codifica en cada fila, representando a cada observación, el cluster al que pertenece, mediante un $1$ en la colúmna del cluster $i$ y $0$ en las demás. A cada elemento de $R$ se lo denominará como $r_{ij}$
+        	Se define una matriz binaria $R$ de dimensiones $m\times k$ dónde $m$ es el número de observaciones, esta matriz codifica en cada fila, representando a cada observación, el cluster al que pertenece, mediante un $1$ en la colúmna del cluster $i$ y $0$ en las demás. A cada elemento de $R$ se lo denominará como $r_{ij}$.
         	
         	Se busca minimizar la distancia entre elementos de cada cluster, es decir la distancia de una observación con su respectivo centroide, esto se hace optimizando la función de costo:
         	
@@ -104,7 +105,8 @@
         
         	\begin{figure}[H]
         		\centering
-        		\includegraphics[scale=0.5]{imagenes/kmeans}
+%        		\includegraphics[scale=0.5]{imagenes/kmeans}
+				\includegraphics[scale=0.31]{imagenes/kmeans}
         		\caption[Ajuste iterativo de k-means]{ajuste iterativo de k-means\\Fuente: \citep{bishop}}
         	\end{figure}
         \subsection{FLOOD FILL}
@@ -117,6 +119,7 @@
         			\caption{\textit{Flood Fill}}
         			\SetAlgoLined
         			\KwData{$mat:$ Matriz de valores}
+%        			\KwData{$x, y:$ coordenada actual}
         			\KwData{$y:$ coordenada vertical actual}
         			\KwData{$x:$ coordenada horizontal actual}
         			\KwData{$d:$ vector de direcciones}

@@ -37,15 +37,15 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {11}{\ignorespaces Intensidad de los canales de color RGB}}{17}{figure.caption.11}
+\contentsline {figure}{\numberline {11}{\ignorespaces Intensidad de los canales de color RGB}}{18}{figure.caption.11}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {12}{\ignorespaces Convoluci\IeC {\'o}n del filtro $K$ con la imagen $I$}}{18}{figure.caption.12}
+\contentsline {figure}{\numberline {12}{\ignorespaces Convoluci\IeC {\'o}n del filtro $K$ con la imagen $I$}}{19}{figure.caption.12}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {13}{\ignorespaces Dilataci\IeC {\'o}n sobre un conjunto de letras con discontinuidades}}{19}{figure.caption.13}
+\contentsline {figure}{\numberline {13}{\ignorespaces Dilataci\IeC {\'o}n sobre un conjunto de letras con discontinuidades}}{20}{figure.caption.13}
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {14}{\ignorespaces Erosi\IeC {\'o}n de una letra}}{20}{figure.caption.14}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {15}{\ignorespaces Apertura aplicada a una huella digital}}{20}{figure.caption.15}
+\contentsline {figure}{\numberline {15}{\ignorespaces Apertura aplicada a una huella digital}}{21}{figure.caption.15}
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {16}{\ignorespaces Ajuste iterativo de k-means}}{22}{figure.caption.16}
 \defcounter {refsection}{0}\relax 
@@ -79,11 +79,11 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {30}{\ignorespaces Etiquetas de profundidad imagen}}{45}{figure.caption.30}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {31}{\ignorespaces Segmentaci\IeC {\'o}n sem\IeC {\'a}ntica con c\IeC {\'o}digos de color}}{46}{figure.caption.31}
+\contentsline {figure}{\numberline {31}{\ignorespaces Segmentaci\IeC {\'o}n sem\IeC {\'a}ntica con c\IeC {\'o}digos de color}}{45}{figure.caption.31}
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {32}{\ignorespaces Etapas del etiquetado de intersecciones}}{48}{figure.caption.32}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {33}{\ignorespaces Entrenamiento de tres redes neuronales}}{49}{figure.caption.33}
+\contentsline {figure}{\numberline {33}{\ignorespaces Entrenamiento de tres redes neuronales}}{50}{figure.caption.33}
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {34}{\ignorespaces Arquitectura DriveNet basada en Mobilenet V2}}{50}{figure.caption.34}
 \defcounter {refsection}{0}\relax 
@@ -109,25 +109,25 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {45}{\ignorespaces Predicci\IeC {\'o}n Media M\IeC {\'o}vil Exponencial}}{61}{figure.caption.45}
+\contentsline {figure}{\numberline {45}{\ignorespaces Predicci\IeC {\'o}n Media M\IeC {\'o}vil Exponencial}}{62}{figure.caption.45}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {46}{\ignorespaces Predicci\IeC {\'o}n vs valor esperado de profundidad}}{62}{figure.caption.46}
+\contentsline {figure}{\numberline {46}{\ignorespaces Predicci\IeC {\'o}n vs valor esperado de profundidad}}{63}{figure.caption.46}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {47}{\ignorespaces Matriz de confusi\IeC {\'o}n de segmentaci\IeC {\'o}n sem\IeC {\'a}ntica}}{63}{figure.caption.47}
+\contentsline {figure}{\numberline {47}{\ignorespaces Matriz de confusi\IeC {\'o}n de segmentaci\IeC {\'o}n sem\IeC {\'a}ntica}}{64}{figure.caption.47}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {48}{\ignorespaces Predicci\IeC {\'o}n vs valor esperado de segmentaci\IeC {\'o}n}}{65}{figure.caption.48}
+\contentsline {figure}{\numberline {48}{\ignorespaces Predicci\IeC {\'o}n vs valor esperado de segmentaci\IeC {\'o}n}}{66}{figure.caption.48}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {49}{\ignorespaces Cajas delimitadoras}}{66}{figure.caption.49}
+\contentsline {figure}{\numberline {49}{\ignorespaces Cajas delimitadoras}}{67}{figure.caption.49}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {50}{\ignorespaces Cuantizaci\IeC {\'o}n y Clasificaci\IeC {\'o}n del Color}}{68}{figure.caption.50}
+\contentsline {figure}{\numberline {50}{\ignorespaces Cuantizaci\IeC {\'o}n y Clasificaci\IeC {\'o}n del Color}}{69}{figure.caption.50}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {51}{\ignorespaces Distancia a de objetos}}{69}{figure.caption.51}
+\contentsline {figure}{\numberline {51}{\ignorespaces Distancia a de objetos}}{70}{figure.caption.51}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {52}{\ignorespaces Regiones de Inter\IeC {\'e}s en la Inferencia de Direcci\IeC {\'o}n}}{70}{figure.caption.52}
+\contentsline {figure}{\numberline {52}{\ignorespaces Regiones de Inter\IeC {\'e}s en la Inferencia de Direcci\IeC {\'o}n}}{71}{figure.caption.52}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {53}{\ignorespaces Comparaci\IeC {\'o}n de Direcci\IeC {\'o}n Real y Estimada}}{71}{figure.caption.53}
+\contentsline {figure}{\numberline {53}{\ignorespaces Comparaci\IeC {\'o}n de Direcci\IeC {\'o}n Real y Estimada}}{72}{figure.caption.53}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {54}{\ignorespaces Charco erroneamente Clasificado}}{72}{figure.caption.54}
+\contentsline {figure}{\numberline {54}{\ignorespaces Charco erroneamente Clasificado}}{73}{figure.caption.54}
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {55}{\ignorespaces Colisi\IeC {\'o}n con Poste}}{73}{figure.caption.56}
 \defcounter {refsection}{0}\relax 

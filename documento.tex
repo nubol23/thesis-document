@@ -46,14 +46,19 @@ citecolor=black, urlcolor=black,hidelinks]{hyperref}
 
 % Eliminar la palabra "Capítulo" y forzar que sea del mismo tamaño que el resto del texto
 \usepackage{titlesec}
-%\titleformat{\chapter}
-%  {\normalsize\bfseries}{\thechapter.}{0.5em}{}
-%  \titlespacing*{\chapter}{0pt}{14pt}{14pt}
+%\usepackage{sectsty}
+\titleformat{\chapter}
+  {\normalsize\bfseries}{CAPÍTULO \thechapter.}{0.5em}{}
+  \titlespacing*{\chapter}{0pt}{14pt}{14pt}
+
+%\chapternumberfont{\normalsize}
+%\chaptertitlefont{\normalsize}
+
 \newcommand{\negspacechap}{\titleformat{\chapter}		% nuevo comando eliminar espacio previo
-	{\normalsize\bfseries}{\thechapter.}{0.5em}{}
+	{\normalsize\bfseries}{CAPÍTULO \thechapter.}{0.5em}{}
 	\titlespacing*{\chapter}{0pt}{-14pt}{2mm}}
 \newcommand{\pospacechap}{\titleformat{\chapter}		% mantener el espacio reacomodar tamaño
-	{\normalsize\bfseries}{\thechapter.}{0.5em}{}
+	{\normalsize\bfseries}{CAPÍTULO \thechapter.}{0.5em}{}
 	\titlespacing*{\chapter}{0pt}{14pt}{2mm}}
 
 \newcommand{\negspacesec}{\titleformat{\section}		
@@ -106,7 +111,7 @@ citecolor=black, urlcolor=black,hidelinks]{hyperref}
 
 % Sobreescribir los capítulos para que empiecen seguidos sin saltos de páginas
 \makeatletter
-\patchcmd{\chapter}{\if@openright\cleardoublepage\else\clearpage\fi}{}{}{}
+%\patchcmd{\chapter}{\if@openright\cleardoublepage\else\clearpage\fi}{}{}{}
 \makeatother
 
 % Contar las figuras sin el capítulo
@@ -149,11 +154,22 @@ citecolor=black, urlcolor=black,hidelinks]{hyperref}
 \renewcommand{\cftlottitlefont}{\hspace{6.3cm}\large\bfseries}
 \renewcommand{\cftafterlottitleskip}{0.0\baselineskip}
 
-\begin{document}
+\usepackage{longtable}
+\usepackage[printwatermark]{xwatermark}
+\usepackage{transparent}
+
+\newcommand\blfootnote[1]{%
+	\begingroup
+	\renewcommand\thefootnote{}\footnote{#1}%
+	\addtocounter{footnote}{-1}%
+	\endgroup
+}
+
+\begin{document}	
 	\frontmatter % numeros romanos
 	\include{caratula}
-	\includepdf[page={2}]{T-3395}
-%	\include{licencia}
+%	\includepdf[page={2}]{T-3395}
+	\includepdf[page={1}]{licencia}
 
 	\setcounter{page}{3}
 	\include{agradecimiento}
@@ -172,7 +188,10 @@ citecolor=black, urlcolor=black,hidelinks]{hyperref}
 	
 	\mainmatter %numeros arabicos.
     \setcounter{page}{1}
+    
+    \newwatermark[pages=1-78,scale=0.13,xpos=-7,ypos=0]{\includegraphics{imagenes/bg}}
     \raggedbottom
+
 	\input{capitulos/capitulo1/1-marco-referencial}
 	
 	\input{capitulos/capitulo2/2-marco-teorico}
@@ -186,5 +205,13 @@ citecolor=black, urlcolor=black,hidelinks]{hyperref}
     \input{capitulos/13-bibliografia}
     
     \input{capitulos/anexos}
-	
+    \newpage
+	\pagenumbering{gobble}
+    \topskip0pt
+    \vspace*{\fill}
+    \hfill\begin{minipage}{\dimexpr\textwidth-4.3cm}
+    	 \Huge DOCUMENTACIÓN
+    \end{minipage}
+	\vspace*{\fill}
+	\newpage
 \end{document}

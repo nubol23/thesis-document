@@ -1,5 +1,6 @@
 \section{SISTEMAS DE CONDUCCIÓN AUTÓNOMA}
-    Un sistema de conducción autónoma es una combinación de varios componentes o subsistemas donde las tareas de percepción, toma de decisiones y operación de un vehículo son desarrolladas por un sistema electrónico en lugar de un conductor humano
+    Un sistema de conducción autónoma es una combinación de varios componentes o subsistemas donde las tareas de percepción, toma de decisiones y operación de un vehículo son desarrolladas por un sistema electrónico en lugar de un conductor humano.
+    
     \subsection{TAREAS DE LA CONDUCCIÓN AUTÓNOMA}
     Para lograr la conducción autónoma, se deben dividir tareas modulares, esto con el fin de poder realizar pruebas de cada componente y en caso de fallos, poder detectarlos aisladamente y que no afecten a los demás componentes.
     
@@ -29,18 +30,17 @@
 		La funcionalidad más importante de carla es poder extraer la imagen de cámaras y sensores virtuales para generar datos de entrenamiento, y poder controlar el vehículo mediante código para realizar pruebas de modelos aprendidos \citep{Dosovitskiy17}.
 		
 	\subsection{NIVELES DE CONDUCCIÓN AUTÓNOMA}
-	La Sociedad de Ingenieros de Automoción internacional definió 5 niveles de conducción autónomas con sus características.
-	
 	\begingroup
 %	\baselinestretch{1em}
 	\setstretch{1.2}
 	\begin{center}
 		\footnotesize
+%		\scriptsize
 		\begin{tabularx}{\textwidth}{|l|X|}
 			\hline
 			\textbf{Nivel de automatización} & \textbf{Tareas} \\
 			\hline
-			Nivel 0 & No existe ningún tipo de automatización y el conductor humano se encarga de todo \\
+			Nivel 0 & No existe ningún tipo de automatización y el conductor humano se encarga de todo. \\
 			\hline
 			Nivel 1 & El sistema puede realizar el control longitudinal (aceleración) o lateral (giro), no ambos. \\
 			\hline
@@ -57,5 +57,7 @@
 		\captionof{table}[Niveles de Conducción Autónoma]{niveles de conducción autónoma Fuente:\citep{J3016_201806}}\label{niveles}
 	\end{center}
 	\endgroup
-	\vspace{-4mm}
+	\vspace{-4mm}	
+	La Sociedad de Ingenieros de Automoción internacional definió 5 niveles de conducción autónomas con sus características.
+	
 	Se considera como nivel básico de conducción autónoma a las tareas de control descrito en el nivel 2.

@@ -1,14 +1,14 @@
 \section{MODELADO}
 	Una vez se tienen los datos disponibles, se debe definir una arquitectura de entrenamiento de modelos de aprendizaje profundo sobre los datos, las redes neuronales se implementan en Python usando la libreria Pytorch.
 	
+	Estos módulos están compuestos por tres redes neuronales basadas en la arquitectura Mobilenet V2, modificando la implementación estándar y su variante para inferencia de profundidad, un modelo estadístico llamado media exponencial móvil para el suavizado de la dirección, y el algoritmo K means para la cuantificación digital de colores.
+	
 	\begin{figure}[H]
 		\centering
 		\includegraphics[scale=0.8]{imagenes/arquitectura_entrenamiento}
 		\caption[Entrenamiento de tres redes neuronales]{entrenamiento de las tres redes neuronales}
 		\label{training}
 	\end{figure}
-	
-	Estos módulos están compuestos por tres redes neuronales basadas en la arquitectura Mobilenet V2, modificando la implementación estándar y su variante para inferencia de profundidad, un modelo estadístico llamado media exponencial móvil para el suavizado de la dirección, y el algoritmo K means para la cuantificación digital de colores.
 	
 	\subsection{RED DE CONDUCCIÓN}
 		Denominada DriveNet, esta red es una modificación de la Mobilenet V2 estándar.
@@ -67,7 +67,8 @@
 		
 		\begin{figure}[H]
 			\centering
-			\includegraphics[scale=0.4]{imagenes/ema}
+%			\includegraphics[scale=0.4]{imagenes/ema}
+			\includegraphics[scale=0.38]{imagenes/ema}
 			\caption[Aplicación de medias exponenciales móviles]{Aplicación de medias exponenciales móviles para suavizar la dirección}
 			\label{ema}
 		\end{figure}
@@ -125,7 +126,7 @@
 		
 		\begin{figure}[H]
 			\centering
-			\includegraphics[scale=0.8]{imagenes/arquitectura_inferencia}
+			\includegraphics[scale=0.73]{imagenes/arquitectura_inferencia}
 			\caption[Modelo de conducción autónoma]{modelo de conducción autónoma}
 			\label{model}
 		\end{figure}

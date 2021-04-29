@@ -7,6 +7,8 @@ Una vez se tiene la certeza del funcionamiento del modelo mediante el análisis 
 \subsection{CONDUCCIÓN}
 Ya se revisaron los resultados de segmentación, estimación de distancias y clasificación de objetos en la imagen, luego de pasar por todas las etapas descritas del modelo, las salidas obtenidas son el valor del giro y la aceleración.
 
+Comparando las predicciones en distintas situaciones se tienen los resultados de la figura \ref{steer}, de la cual se puede observar en los casos $a, b, c, h, i$, los cuales consisten en giros durante intersecciones, que el modelo es mucho más agresivo al tomar las curvas, aplicando un giro mayor de la dirección. En el caso $f$ que es una intersección en la cual se decide seguir recto, predice correctamente no girar. En la situación de la imagen $g$, se tiene una casi colisión con otro vehículo, en cuyo caso la predicción es 0, al igual que la aceleración, y finalmente en las imágenes $d$ y $e$ no existe mucha variación del $0$ ya que se encuentra en una recta dentro de su carril.
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.63]{imagenes/preds/steer}
@@ -14,7 +16,7 @@ Ya se revisaron los resultados de segmentación, estimación de distancias y cla
 	\label{steer}
 \end{figure}
 
-Comparando las predicciones en distintas situaciones se tienen los resultados de la figura \ref{steer}, de la cual se puede observar en los casos $a, b, c, h, i$, los cuales consisten en giros durante intersecciones, que el modelo es mucho más agresivo al tomar las curvas, aplicando un giro mayor de la dirección. En el caso $f$ que es una intersección en la cual se decide seguir recto, predice correctamente no girar. En la situación de la imagen $g$, se tiene una casi colisión con otro vehículo, en cuyo caso la predicción es 0, al igual que la aceleración, y finalmente en las imágenes $d$ y $e$ no existe mucha variación del $0$ ya que se encuentra en una recta dentro de su carril.
+%Comparando las predicciones en distintas situaciones se tienen los resultados de la figura \ref{steer}, de la cual se puede observar en los casos $a, b, c, h, i$, los cuales consisten en giros durante intersecciones, que el modelo es mucho más agresivo al tomar las curvas, aplicando un giro mayor de la dirección. En el caso $f$ que es una intersección en la cual se decide seguir recto, predice correctamente no girar. En la situación de la imagen $g$, se tiene una casi colisión con otro vehículo, en cuyo caso la predicción es 0, al igual que la aceleración, y finalmente en las imágenes $d$ y $e$ no existe mucha variación del $0$ ya que se encuentra en una recta dentro de su carril.
 
 \subsection{FALLOS}
 A pesar del buen rendimiento del modelo en las situaciones de prueba, siempre existe un margen de error contemplado en las métricas evaluadas, así se presentan situaciones puntuales donde el vehículo se detiene abruptamente al confundir charcos de agua en la vía con vehículos cercanos (figura \ref{charco}), o los más graves cuando se sale del camino y colisiona con objetos en las aceras \ref{colision}.
@@ -37,12 +39,14 @@ En la figura \ref{colision} se nota que la segmentación falla al no detectar el
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.22]{imagenes/preds/crash1}
+%	\includegraphics[scale=0.22]{imagenes/preds/crash1}
+	\includegraphics[scale=0.18]{imagenes/preds/crash1}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.22]{imagenes/preds/crash2}
+%	\includegraphics[scale=0.22]{imagenes/preds/crash2}
+	\includegraphics[scale=0.18]{imagenes/preds/crash2}
 	\caption[Colisión con Poste]{colisión con poste}
 	\label{colision}
 \end{figure}
