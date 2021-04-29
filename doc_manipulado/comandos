@@ -1,7 +1,0 @@
-pdftk documento.pdf cat 1-14 output pre.pdf
-pdftk documento.pdf cat 15-92 output cont.pdf
-pdftk documento.pdf cat 93-end output pos.pdf
-
-pdftk cont.pdf background bg.pdf output cont_wm.pdf
-
-pdftk pre.pdf cont_wm.pdf pos.pdf cat output final.pdf
